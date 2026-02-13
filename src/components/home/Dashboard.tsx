@@ -1,19 +1,15 @@
 import { useState, useEffect } from 'react';
-import { 
-  Settings, 
+import {
   ChevronRight,
-  Zap,
-  Trophy,
-  BarChart3,
-  Users,
-  MapPin,
-  Gamepad2,
   Home,
   FileText,
   Tv,
+  Trophy,
   MessageSquare,
   Calendar
 } from 'lucide-react';
+import { Header } from './Header';
+import { HorizontalNav } from './HorizontalNav';
 
 interface DashboardProps {
   points: number;
@@ -25,7 +21,11 @@ interface DashboardProps {
 
 export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: DashboardProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [activeNav, setActiveNav] = useState('partidos');
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
 
   const slides = [
     {
@@ -50,16 +50,6 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
     }, 5000);
     return () => clearInterval(timer);
   }, []);
-
-  const navItems = [
-    { id: 'apuestas', icon: <FileText size={20} />, label: 'Mis Apuestas' },
-    { id: 'match', icon: <Tv size={20} />, label: 'Match' },
-    { id: 'partidos', icon: <Zap size={20} />, label: 'Partidos' },
-    { id: 'grupos', icon: <BarChart3 size={20} />, label: 'Grupos' },
-    { id: 'selecciones', icon: <Users size={20} />, label: 'Selecciones' },
-    { id: 'sedes', icon: <MapPin size={20} />, label: 'Sedes' },
-    { id: 'mododt', icon: <Gamepad2 size={20} />, label: 'Modo DT' },
-  ];
 
   const upcomingMatches = [
     {
@@ -156,172 +146,28 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
   ];
 
   return (
+    <>
     <div style={{
       minHeight: '100vh',
       background: 'var(--bg-primary)',
       paddingBottom: 90,
+      opacity: isLoaded ? 1 : 0,
+      transform: isLoaded ? 'translateY(0)' : 'translateY(20px)',
+      transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
     }}>
-      {/* HEADER - CENTRADO */}
+      {/* HEADER */}
       <div style={{
-        background: 'var(--bg-secondary)',
-        padding: 'var(--space-3) var(--space-4)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderBottom: '1px solid var(--border-primary)',
-        position: 'relative',
+        animation: 'slideDown 0.6s ease-out',
       }}>
-        {/* Settings a la izquierda */}
-        <button 
-          style={{
-            position: 'absolute',
-            left: 'var(--space-4)',
-            width: 36,
-            height: 36,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'var(--bg-tertiary)',
-            border: '1px solid var(--border-primary)',
-            borderRadius: 'var(--radius-md)',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
-          }}
-        >
-          <Settings size={18} />
-        </button>
-
-        {/* Logo centrado */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-2)',
-        }}>
-          <div style={{
-            width: 32,
-            height: 32,
-            background: 'var(--color-primary)',
-            borderRadius: 'var(--radius-md)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '18px',
-          }}>
-            🏆
-          </div>
-          <span style={{
-            fontSize: 'var(--text-lg)',
-            fontWeight: 'var(--font-black)',
-            color: 'var(--text-primary)',
-          }}>
-            QuinielaMundial
-          </span>
-        </div>
-        
-        {/* Puntos a la derecha */}
-        <div style={{
-          position: 'absolute',
-          right: 'var(--space-4)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-2)',
-        }}>
-          {/* Bandera ES */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            padding: '4px 8px',
-            background: 'var(--bg-tertiary)',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--border-primary)',
-          }}>
-            <span style={{ fontSize: '14px' }}>🇪🇸</span>
-            <span style={{
-              fontSize: 'var(--text-xs)',
-              fontWeight: 'var(--font-bold)',
-              color: 'var(--text-primary)',
-            }}>ES</span>
-          </div>
-          
-          {/* Puntos */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            padding: '4px 10px',
-            background: 'var(--bg-tertiary)',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--border-primary)',
-          }}>
-            <Zap size={14} style={{ color: 'var(--color-primary)' }} />
-            <span style={{
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-black)',
-              color: 'var(--color-primary)',
-            }}>
-              {points}
-            </span>
-          </div>
-        </div>
+        <Header points={points} />
       </div>
 
       {/* NAVEGACIÓN HORIZONTAL */}
-      <div style={{
-        background: 'var(--bg-secondary)',
-        padding: 'var(--space-3) 0',
-        borderBottom: '1px solid var(--border-primary)',
-        overflowX: 'auto',
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-      }}>
-        <div style={{
-          display: 'flex',
-          gap: 'var(--space-2)',
-          padding: '0 var(--space-4)',
-          minWidth: 'max-content',
-        }}>
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveNav(item.id)}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '4px',
-                padding: 'var(--space-2) var(--space-3)',
-                background: activeNav === item.id 
-                  ? 'var(--bg-elevated)' 
-                  : 'transparent',
-                border: activeNav === item.id 
-                  ? '1px solid var(--border-secondary)' 
-                  : '1px solid transparent',
-                borderRadius: 'var(--radius-lg)',
-                cursor: 'pointer',
-                minWidth: '64px',
-              }}
-            >
-              <div style={{
-                color: activeNav === item.id ? 'var(--color-primary)' : 'var(--text-tertiary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-                {item.icon}
-              </div>
-              <span style={{
-                fontSize: '10px',
-                fontWeight: activeNav === item.id ? 'var(--font-semibold)' : 'var(--font-medium)',
-                color: activeNav === item.id ? 'var(--color-primary)' : 'var(--text-tertiary)',
-                whiteSpace: 'nowrap',
-              }}>
-                {item.label}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
+      <HorizontalNav
+        onNavigate={onNavigate}
+        activeBetsCount={3}
+        hasLiveMatch={true}
+      />
 
       {/* CONTENIDO */}
       <div style={{ padding: 'var(--space-4)' }}>
@@ -333,6 +179,8 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
           overflow: 'hidden',
           marginBottom: 'var(--space-4)',
           minHeight: '160px',
+          animation: 'scaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.15), 0 0 60px rgba(99, 102, 241, 0.1)',
         }}>
           {/* Imagen de fondo */}
           <div style={{
@@ -341,13 +189,17 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
             backgroundImage: `url(${slides[currentSlide].image})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
+            transition: 'transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease',
+            transform: 'scale(1.05)',
+            animation: 'kenBurns 20s ease-in-out infinite alternate',
           }} />
-          
+
           {/* Overlay gradiente */}
           <div style={{
             position: 'absolute',
             inset: 0,
             background: 'linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.6) 100%)',
+            transition: 'opacity 0.8s ease',
           }} />
           
           {/* Contenido */}
@@ -362,6 +214,15 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
               color: 'var(--color-primary)',
               letterSpacing: '1px',
               marginBottom: 'var(--space-2)',
+              display: 'inline-block',
+              padding: '4px 12px',
+              background: 'rgba(99, 102, 241, 0.15)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid rgba(99, 102, 241, 0.3)',
+              backdropFilter: 'blur(10px)',
+              animation: 'pulse 2s ease-in-out infinite',
+              textShadow: '0 0 20px rgba(99, 102, 241, 0.8)',
+              boxShadow: '0 0 20px rgba(99, 102, 241, 0.3), inset 0 0 10px rgba(99, 102, 241, 0.1)',
             }}>
               {slides[currentSlide].badge}
             </div>
@@ -372,7 +233,8 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
               lineHeight: 1.3,
               maxWidth: '70%',
               marginBottom: 'var(--space-4)',
-              textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+              textShadow: '0 2px 4px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3)',
+              animation: 'slideInLeft 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both',
             }}>
               {slides[currentSlide].title}
             </h2>
@@ -393,6 +255,18 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
                   fontWeight: 'var(--font-bold)',
                   fontSize: 'var(--text-sm)',
                   cursor: 'pointer',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transform: 'scale(1)',
+                  boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4), 0 0 30px rgba(99, 102, 241, 0.2)',
+                  animation: 'fadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.08) translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(99, 102, 241, 0.6), 0 0 40px rgba(99, 102, 241, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(99, 102, 241, 0.4), 0 0 30px rgba(99, 102, 241, 0.2)';
                 }}
               >
                 {slides[currentSlide].buttonText}
@@ -402,6 +276,7 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
               <div style={{
                 display: 'flex',
                 gap: '6px',
+                animation: 'fadeIn 1s ease-out 0.6s both',
               }}>
                 {slides.map((_, idx) => (
                   <button
@@ -414,7 +289,15 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
                       background: idx === currentSlide ? 'var(--color-primary)' : 'rgba(255,255,255,0.4)',
                       border: 'none',
                       cursor: 'pointer',
-                      transition: 'all 0.3s',
+                      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: idx === currentSlide ? '0 0 15px rgba(99, 102, 241, 0.8)' : 'none',
+                      transform: 'scale(1)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
                     }}
                   />
                 ))}
@@ -430,7 +313,20 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
           borderRadius: 'var(--radius-xl)',
           padding: 'var(--space-4)',
           marginBottom: 'var(--space-4)',
-        }}>
+          animation: 'scaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 0 0 1px rgba(255,255,255,0.05)',
+          transition: 'all 0.3s ease',
+          cursor: 'pointer',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-4px)';
+          e.currentTarget.style.boxShadow = '0 12px 48px rgba(0,0,0,0.12), 0 0 60px rgba(239, 68, 68, 0.15)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.08), 0 0 0 1px rgba(255,255,255,0.05)';
+        }}
+        >
           {/* Header del partido */}
           <div style={{
             display: 'flex',
@@ -449,11 +345,24 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
                 background: 'var(--color-error)',
                 borderRadius: '50%',
                 animation: 'pulse 1.5s infinite',
-              }} />
+                boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.7)',
+                position: 'relative',
+              }}>
+                <span style={{
+                  position: 'absolute',
+                  inset: -4,
+                  borderRadius: '50%',
+                  animation: 'ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
+                  background: 'var(--color-error)',
+                  opacity: 0.75,
+                }} />
+              </span>
               <span style={{
                 fontSize: '11px',
                 fontWeight: 'var(--font-black)',
                 color: 'var(--color-error)',
+                textShadow: '0 0 15px rgba(239, 68, 68, 0.5)',
+                animation: 'glow 2s ease-in-out infinite',
               }}>
                 EN VIVO
               </span>
@@ -480,15 +389,25 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
               alignItems: 'center',
               gap: 'var(--space-2)',
             }}>
-              <img 
-                src="https://flagcdn.com/w80/mx.png" 
+              <img
+                src="https://flagcdn.com/w80/mx.png"
                 alt="México"
                 style={{
                   width: 48,
                   height: 32,
                   borderRadius: 'var(--radius-sm)',
                   objectFit: 'cover',
-                  boxShadow: 'var(--shadow-md)',
+                  boxShadow: 'var(--shadow-md), 0 0 20px rgba(0,0,0,0.2)',
+                  transition: 'all 0.3s ease',
+                  animation: 'fadeInScale 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.15) rotate(2deg)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md), 0 0 20px rgba(0,0,0,0.2)';
                 }}
               />
               <span style={{
@@ -509,12 +428,15 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
                 fontSize: 'var(--text-3xl)',
                 fontWeight: 'var(--font-black)',
                 color: 'var(--text-primary)',
+                textShadow: '0 0 20px rgba(99, 102, 241, 0.6)',
+                animation: 'scorePopIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.6s both',
               }}>
                 1
               </span>
               <span style={{
                 fontSize: 'var(--text-xl)',
                 color: 'var(--text-tertiary)',
+                animation: 'fadeIn 0.8s ease 0.7s both',
               }}>
                 -
               </span>
@@ -522,6 +444,8 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
                 fontSize: 'var(--text-3xl)',
                 fontWeight: 'var(--font-black)',
                 color: 'var(--text-primary)',
+                textShadow: '0 0 20px rgba(99, 102, 241, 0.6)',
+                animation: 'scorePopIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.7s both',
               }}>
                 0
               </span>
@@ -533,15 +457,25 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
               alignItems: 'center',
               gap: 'var(--space-2)',
             }}>
-              <img 
-                src="https://flagcdn.com/w80/za.png" 
+              <img
+                src="https://flagcdn.com/w80/za.png"
                 alt="Sudáfrica"
                 style={{
                   width: 48,
                   height: 32,
                   borderRadius: 'var(--radius-sm)',
                   objectFit: 'cover',
-                  boxShadow: 'var(--shadow-md)',
+                  boxShadow: 'var(--shadow-md), 0 0 20px rgba(0,0,0,0.2)',
+                  transition: 'all 0.3s ease',
+                  animation: 'fadeInScale 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s both',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.15) rotate(-2deg)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md), 0 0 20px rgba(0,0,0,0.2)';
                 }}
               />
               <span style={{
@@ -558,14 +492,18 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
           <div style={{
             textAlign: 'center',
             padding: 'var(--space-2)',
-            background: 'var(--bg-tertiary)',
+            background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%)',
             borderRadius: 'var(--radius-md)',
             marginBottom: 'var(--space-3)',
+            border: '1px solid rgba(34, 197, 94, 0.2)',
+            animation: 'wiggle 2s ease-in-out infinite',
+            boxShadow: '0 0 20px rgba(34, 197, 94, 0.15)',
           }}>
             <span style={{
               fontSize: 'var(--text-xs)',
               color: 'var(--color-success)',
               fontWeight: 'var(--font-semibold)',
+              textShadow: '0 0 10px rgba(34, 197, 94, 0.5)',
             }}>
               Tu predicción va ganando ✓
             </span>
@@ -586,7 +524,7 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
 
         {/* ESPACIO PUBLICITARIO */}
         <div style={{
-          background: 'var(--bg-tertiary)',
+          background: 'linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%)',
           border: '1px solid var(--border-primary)',
           borderRadius: 'var(--radius-lg)',
           padding: 'var(--space-4)',
@@ -595,8 +533,23 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
           alignItems: 'center',
           justifyContent: 'center',
           gap: 'var(--space-2)',
-        }}>
-          <span style={{ fontSize: 'var(--text-md)' }}>📢</span>
+          animation: 'fadeInUp 0.8s ease-out 0.4s both',
+          transition: 'all 0.3s ease',
+          cursor: 'pointer',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.02)';
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = 'none';
+        }}
+        >
+          <span style={{
+            fontSize: 'var(--text-md)',
+            animation: 'pulse 2s ease-in-out infinite',
+          }}>📢</span>
           <span style={{
             fontSize: 'var(--text-sm)',
             color: 'var(--text-tertiary)',
@@ -608,6 +561,7 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
             fontSize: '10px',
             color: 'var(--text-tertiary)',
             marginLeft: 'auto',
+            opacity: 0.6,
           }}>
             AD
           </span>
@@ -626,6 +580,17 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
+            animation: 'slideInRight 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateX(8px)';
+            e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.1), 0 0 40px rgba(99, 102, 241, 0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateX(0)';
+            e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.05)';
           }}
         >
           <div style={{
@@ -636,12 +601,15 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
             <div style={{
               width: 44,
               height: 44,
-              background: 'var(--bg-tertiary)',
+              background: 'linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-elevated) 100%)',
               borderRadius: 'var(--radius-lg)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '20px',
+              animation: 'bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.6s both',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             }}>
               📋
             </div>
@@ -670,16 +638,22 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
               fontSize: 'var(--text-lg)',
               fontWeight: 'var(--font-black)',
               color: 'var(--color-primary)',
+              textShadow: '0 0 15px rgba(99, 102, 241, 0.5)',
+              animation: 'pulse 2s ease-in-out infinite',
             }}>
               3
             </span>
-            <ChevronRight size={20} style={{ color: 'var(--text-tertiary)' }} />
+            <ChevronRight size={20} style={{
+              color: 'var(--text-tertiary)',
+              transition: 'transform 0.3s ease',
+              animation: 'slideInRight 0.5s ease 0.8s both',
+            }} />
           </div>
         </div>
 
         {/* MODO ACTUAL */}
         <div style={{
-          background: 'var(--bg-secondary)',
+          background: 'linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-elevated) 100%)',
           border: '1px solid var(--border-primary)',
           borderRadius: 'var(--radius-lg)',
           padding: 'var(--space-3) var(--space-4)',
@@ -687,13 +661,29 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-        }}>
+          animation: 'slideInRight 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.55s both',
+          transition: 'all 0.3s ease',
+          cursor: 'pointer',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateX(4px)';
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateX(0)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+        }}
+        >
           <div style={{
             display: 'flex',
             alignItems: 'center',
             gap: 'var(--space-2)',
           }}>
-            <span style={{ fontSize: 'var(--text-md)' }}>🎮</span>
+            <span style={{
+              fontSize: 'var(--text-md)',
+              animation: 'pulse 2s ease-in-out infinite',
+            }}>🎮</span>
             <span style={{
               fontSize: 'var(--text-sm)',
               color: 'var(--text-secondary)',
@@ -715,7 +705,18 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
             background: 'transparent',
             border: 'none',
             cursor: 'pointer',
-          }}>
+            transition: 'all 0.3s ease',
+            textShadow: '0 0 10px rgba(99, 102, 241, 0.3)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateX(4px)';
+            e.currentTarget.style.textShadow = '0 0 20px rgba(99, 102, 241, 0.6)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateX(0)';
+            e.currentTarget.style.textShadow = '0 0 10px rgba(99, 102, 241, 0.3)';
+          }}
+          >
             Cambiar →
           </button>
         </div>
@@ -726,22 +727,30 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: 'var(--space-2)',
           marginBottom: 'var(--space-4)',
+          animation: 'fadeInUp 0.8s ease-out 0.6s both',
         }}>
-          <StatCard value={points} label="PUNTOS" />
-          <StatCard value={`#${ranking}`} label="RANKING" />
-          <StatCard value={streak} label="RACHA" icon="🔥" />
-          <StatCard value={`${precision}%`} label="PRECISIÓN" />
+          <StatCard value={points} label="PUNTOS" delay={0} />
+          <StatCard value={`#${ranking}`} label="RANKING" delay={0.1} />
+          <StatCard value={streak} label="RACHA" icon="🔥" delay={0.2} />
+          <StatCard value={`${precision}%`} label="PRECISIÓN" delay={0.3} />
         </div>
 
         {/* PRÓXIMOS PARTIDOS */}
-        <div style={{ marginBottom: 'var(--space-4)' }}>
+        <div style={{
+          marginBottom: 'var(--space-4)',
+          animation: 'fadeInUp 0.8s ease-out 0.7s both',
+        }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
             gap: 'var(--space-2)',
             marginBottom: 'var(--space-3)',
           }}>
-            <Calendar size={18} style={{ color: 'var(--color-primary)' }} />
+            <Calendar size={18} style={{
+              color: 'var(--color-primary)',
+              filter: 'drop-shadow(0 0 8px rgba(99, 102, 241, 0.5))',
+              animation: 'pulse 2s ease-in-out infinite',
+            }} />
             <span style={{
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-black)',
@@ -757,7 +766,7 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
             flexDirection: 'column',
             gap: 'var(--space-2)',
           }}>
-            {upcomingMatches.map((match) => (
+            {upcomingMatches.map((match, idx) => (
               <div
                 key={match.id}
                 style={{
@@ -765,6 +774,20 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
                   border: '1px solid var(--border-primary)',
                   borderRadius: 'var(--radius-lg)',
                   padding: 'var(--space-3)',
+                  animation: `slideInLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${0.8 + idx * 0.1}s both`,
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateX(8px)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1), 0 0 30px rgba(99, 102, 241, 0.08)';
+                  e.currentTarget.style.borderColor = 'var(--color-primary)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateX(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+                  e.currentTarget.style.borderColor = 'var(--border-primary)';
                 }}
               >
                 {/* Header del partido */}
@@ -900,7 +923,7 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
 
         {/* ESPACIO PUBLICITARIO 2 */}
         <div style={{
-          background: 'var(--bg-tertiary)',
+          background: 'linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%)',
           border: '1px solid var(--border-primary)',
           borderRadius: 'var(--radius-lg)',
           padding: 'var(--space-4)',
@@ -909,8 +932,23 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
           alignItems: 'center',
           justifyContent: 'center',
           gap: 'var(--space-2)',
-        }}>
-          <span style={{ fontSize: 'var(--text-md)' }}>📢</span>
+          animation: 'fadeInUp 0.8s ease-out 1.1s both',
+          transition: 'all 0.3s ease',
+          cursor: 'pointer',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.02)';
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = 'none';
+        }}
+        >
+          <span style={{
+            fontSize: 'var(--text-md)',
+            animation: 'pulse 2s ease-in-out infinite',
+          }}>📢</span>
           <span style={{
             fontSize: 'var(--text-sm)',
             color: 'var(--text-tertiary)',
@@ -922,13 +960,16 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
             fontSize: '10px',
             color: 'var(--text-tertiary)',
             marginLeft: 'auto',
+            opacity: 0.6,
           }}>
             AD
           </span>
         </div>
 
         {/* NOTICIAS */}
-        <div>
+        <div style={{
+          animation: 'fadeInUp 0.8s ease-out 1.2s both',
+        }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -940,7 +981,11 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
               alignItems: 'center',
               gap: 'var(--space-2)',
             }}>
-              <FileText size={18} style={{ color: 'var(--color-primary)' }} />
+              <FileText size={18} style={{
+                color: 'var(--color-primary)',
+                filter: 'drop-shadow(0 0 8px rgba(99, 102, 241, 0.5))',
+                animation: 'pulse 2s ease-in-out infinite',
+              }} />
               <span style={{
                 fontSize: 'var(--text-sm)',
                 fontWeight: 'var(--font-black)',
@@ -959,7 +1004,21 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
               fontWeight: 'var(--font-semibold)',
               color: 'var(--color-primary)',
               cursor: 'pointer',
-            }}>
+              transition: 'all 0.3s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.background = 'var(--color-primary)';
+              e.currentTarget.style.color = 'white';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.background = 'var(--bg-tertiary)';
+              e.currentTarget.style.color = 'var(--color-primary)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+            >
               Ver más
             </button>
           </div>
@@ -969,7 +1028,7 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
             flexDirection: 'column',
             gap: 'var(--space-3)',
           }}>
-            {news.map((item) => (
+            {news.map((item, idx) => (
               <div
                 key={item.id}
                 style={{
@@ -980,6 +1039,19 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
                   borderRadius: 'var(--radius-lg)',
                   padding: 'var(--space-3)',
                   cursor: 'pointer',
+                  animation: `fadeInUp 0.6s ease-out ${1.3 + idx * 0.1}s both`,
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
+                  e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.12)';
+                  e.currentTarget.style.borderColor = item.categoryColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+                  e.currentTarget.style.borderColor = 'var(--border-primary)';
                 }}
               >
                 <img
@@ -990,6 +1062,14 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
                     height: 60,
                     borderRadius: 'var(--radius-md)',
                     objectFit: 'cover',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
                   }}
                 />
                 <div style={{
@@ -1034,6 +1114,212 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
         </div>
       </div>
 
+      <style>{`
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.5;
+            transform: scale(1.05);
+          }
+        }
+
+        @keyframes ping {
+          75%, 100% {
+            transform: scale(2);
+            opacity: 0;
+          }
+        }
+
+        @keyframes glow {
+          0%, 100% {
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+          }
+          50% {
+            text-shadow: 0 0 25px rgba(239, 68, 68, 0.8), 0 0 35px rgba(239, 68, 68, 0.6);
+          }
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-40px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(40px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes kenBurns {
+          0% {
+            transform: scale(1.05);
+          }
+          100% {
+            transform: scale(1.15);
+          }
+        }
+
+        @keyframes fadeInScale {
+          from {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes scorePopIn {
+          0% {
+            opacity: 0;
+            transform: scale(0);
+          }
+          50% {
+            transform: scale(1.2);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes wiggle {
+          0%, 100% {
+            transform: translateX(0);
+          }
+          25% {
+            transform: translateX(-2px);
+          }
+          75% {
+            transform: translateX(2px);
+          }
+        }
+
+        @keyframes bounceIn {
+          0% {
+            opacity: 0;
+            transform: scale(0.3);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+          70% {
+            transform: scale(0.9);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes bounce {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-4px);
+          }
+        }
+
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(100%);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes shimmer {
+          0% {
+            background-position: -1000px 0;
+          }
+          100% {
+            background-position: 1000px 0;
+          }
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-8px);
+          }
+        }
+
+        @keyframes rotateIn {
+          from {
+            opacity: 0;
+            transform: rotate(-180deg) scale(0.5);
+          }
+          to {
+            opacity: 1;
+            transform: rotate(0) scale(1);
+          }
+        }
+      `}</style>
+    </div>
+
       {/* NAVEGACIÓN INFERIOR */}
       <nav style={{
         position: 'fixed',
@@ -1041,12 +1327,15 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
         left: 0,
         right: 0,
         height: 70,
-        background: 'var(--bg-secondary)',
-        borderTop: '1px solid var(--border-primary)',
+        background: '#1a1f2e',
+        borderTop: '2px solid #2a3142',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-around',
-        zIndex: 100,
+        zIndex: 999999,
+        boxShadow: '0 -8px 32px rgba(0,0,0,0.4), 0 -2px 8px rgba(99,102,241,0.3)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
       }}>
         <BottomNavItem icon={<Home size={22} />} label="Inicio" isActive onClick={() => {}} />
         <BottomNavItem icon={<FileText size={22} />} label="Mis Apuestas" onClick={() => onNavigate('bets')} />
@@ -1054,37 +1343,49 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
         <BottomNavItem icon={<Trophy size={22} />} label="Ranking" onClick={() => onNavigate('ranking')} />
         <BottomNavItem icon={<MessageSquare size={22} />} label="IA" onClick={() => onNavigate('ai')} />
       </nav>
-
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-      `}</style>
-    </div>
+    </>
   );
 };
 
 // Componentes auxiliares
 
 function ActionButton({ icon, label }: { icon: string; label: string }) {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <button style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '4px',
-      padding: 'var(--space-2) var(--space-1)',
-      background: 'var(--bg-tertiary)',
-      border: '1px solid var(--border-primary)',
-      borderRadius: 'var(--radius-md)',
-      cursor: 'pointer',
-    }}>
-      <span style={{ fontSize: '16px' }}>{icon}</span>
+    <button
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '4px',
+        padding: 'var(--space-2) var(--space-1)',
+        background: isHovered
+          ? 'linear-gradient(135deg, var(--color-primary) 0%, rgba(99, 102, 241, 0.8) 100%)'
+          : 'var(--bg-tertiary)',
+        border: '1px solid var(--border-primary)',
+        borderRadius: 'var(--radius-md)',
+        cursor: 'pointer',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: isHovered ? 'translateY(-4px) scale(1.05)' : 'scale(1)',
+        boxShadow: isHovered
+          ? '0 8px 24px rgba(99, 102, 241, 0.3)'
+          : '0 2px 8px rgba(0,0,0,0.05)',
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <span style={{
+        fontSize: '16px',
+        transition: 'all 0.3s ease',
+        transform: isHovered ? 'scale(1.2) rotate(10deg)' : 'scale(1)',
+        display: 'inline-block',
+      }}>{icon}</span>
       <span style={{
         fontSize: '10px',
         fontWeight: 'var(--font-semibold)',
-        color: 'var(--text-secondary)',
+        color: isHovered ? 'white' : 'var(--text-secondary)',
+        transition: 'color 0.3s ease',
       }}>
         {label}
       </span>
@@ -1092,23 +1393,40 @@ function ActionButton({ icon, label }: { icon: string; label: string }) {
   );
 }
 
-function StatCard({ 
-  value, 
+function StatCard({
+  value,
   label,
   icon,
-}: { 
-  value: string | number; 
+  delay = 0,
+}: {
+  value: string | number;
   label: string;
   icon?: string;
+  delay?: number;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <div style={{
-      background: 'var(--bg-secondary)',
-      border: '1px solid var(--border-primary)',
-      borderRadius: 'var(--radius-lg)',
-      padding: 'var(--space-3) var(--space-2)',
-      textAlign: 'center',
-    }}>
+    <div
+      style={{
+        background: isHovered
+          ? 'linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-secondary) 100%)'
+          : 'var(--bg-secondary)',
+        border: '1px solid var(--border-primary)',
+        borderRadius: 'var(--radius-lg)',
+        padding: 'var(--space-3) var(--space-2)',
+        textAlign: 'center',
+        animation: `scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}s both`,
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: isHovered ? 'translateY(-6px) scale(1.05)' : 'scale(1)',
+        boxShadow: isHovered
+          ? '0 12px 32px rgba(0,0,0,0.15), 0 0 40px rgba(99, 102, 241, 0.2)'
+          : '0 4px 12px rgba(0,0,0,0.05)',
+        cursor: 'pointer',
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div style={{
         fontSize: 'var(--text-lg)',
         fontWeight: 'var(--font-black)',
@@ -1118,15 +1436,22 @@ function StatCard({
         alignItems: 'center',
         justifyContent: 'center',
         gap: '2px',
+        textShadow: isHovered ? '0 0 20px rgba(99, 102, 241, 0.6)' : 'none',
+        transition: 'text-shadow 0.3s ease',
       }}>
         {value}
-        {icon && <span style={{ fontSize: '12px' }}>{icon}</span>}
+        {icon && <span style={{
+          fontSize: '12px',
+          animation: isHovered ? 'bounce 0.6s ease infinite' : 'none',
+          display: 'inline-block',
+        }}>{icon}</span>}
       </div>
       <div style={{
         fontSize: '9px',
         fontWeight: 'var(--font-black)',
-        color: 'var(--text-tertiary)',
+        color: isHovered ? 'var(--text-secondary)' : 'var(--text-tertiary)',
         letterSpacing: '0.5px',
+        transition: 'color 0.3s ease',
       }}>
         {label}
       </div>
@@ -1135,28 +1460,44 @@ function StatCard({
 }
 
 function OddButton({ label, value }: { label: string; value: number }) {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      padding: 'var(--space-1) var(--space-2)',
-      background: 'var(--bg-tertiary)',
-      border: '1px solid var(--border-primary)',
-      borderRadius: 'var(--radius-md)',
-      minWidth: 32,
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: 'var(--space-1) var(--space-2)',
+        background: isHovered
+          ? 'linear-gradient(135deg, var(--color-primary) 0%, rgba(99, 102, 241, 0.8) 100%)'
+          : 'var(--bg-tertiary)',
+        border: `1px solid ${isHovered ? 'var(--color-primary)' : 'var(--border-primary)'}`,
+        borderRadius: 'var(--radius-md)',
+        minWidth: 32,
+        cursor: 'pointer',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: isHovered ? 'scale(1.15) translateY(-2px)' : 'scale(1)',
+        boxShadow: isHovered
+          ? '0 6px 20px rgba(99, 102, 241, 0.4)'
+          : '0 2px 8px rgba(0,0,0,0.05)',
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <span style={{
         fontSize: '9px',
         fontWeight: 'var(--font-black)',
-        color: 'var(--text-tertiary)',
+        color: isHovered ? 'rgba(255,255,255,0.8)' : 'var(--text-tertiary)',
+        transition: 'color 0.3s ease',
       }}>
         {label}
       </span>
       <span style={{
         fontSize: 'var(--text-xs)',
         fontWeight: 'var(--font-bold)',
-        color: 'var(--color-primary)',
+        color: isHovered ? 'white' : 'var(--color-primary)',
+        transition: 'color 0.3s ease',
       }}>
         {value}
       </span>
@@ -1164,17 +1505,19 @@ function OddButton({ label, value }: { label: string; value: number }) {
   );
 }
 
-function BottomNavItem({ 
-  icon, 
-  label, 
+function BottomNavItem({
+  icon,
+  label,
   isActive = false,
   onClick,
-}: { 
-  icon: React.ReactNode; 
-  label: string; 
+}: {
+  icon: React.ReactNode;
+  label: string;
   isActive?: boolean;
   onClick: () => void;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <button
       onClick={onClick}
@@ -1188,12 +1531,43 @@ function BottomNavItem({
         padding: 'var(--space-2)',
         cursor: 'pointer',
         color: isActive ? 'var(--color-primary)' : 'var(--text-tertiary)',
+        position: 'relative',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: isActive || isHovered ? 'translateY(-4px)' : 'translateY(0)',
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {icon}
+      {isActive && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '4px',
+          height: '4px',
+          borderRadius: '50%',
+          background: 'var(--color-primary)',
+          boxShadow: '0 0 12px rgba(99, 102, 241, 0.8)',
+          animation: 'pulse 2s ease-in-out infinite',
+        }} />
+      )}
+      <div style={{
+        filter: isActive
+          ? 'drop-shadow(0 0 12px rgba(99, 102, 241, 0.6))'
+          : isHovered
+          ? 'drop-shadow(0 0 8px rgba(99, 102, 241, 0.4))'
+          : 'none',
+        transition: 'filter 0.3s ease',
+        transform: isHovered ? 'scale(1.1)' : 'scale(1)',
+      }}>
+        {icon}
+      </div>
       <span style={{
         fontSize: '10px',
         fontWeight: isActive ? 'var(--font-bold)' : 'var(--font-medium)',
+        textShadow: isActive ? '0 0 10px rgba(99, 102, 241, 0.5)' : 'none',
+        transition: 'all 0.3s ease',
       }}>
         {label}
       </span>

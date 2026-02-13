@@ -4,7 +4,8 @@
       "Bash(dir:*)",
       "Bash(npm run dev:*)",
       "Bash(explorer:*)",
-      "Bash(start \"\" \"C:\\\\Users\\\\usuario\\\\Downloads\\\\juegofutbol\\\\app.html\")"
+      "Bash(start \"\" \"C:\\\\Users\\\\usuario\\\\Downloads\\\\juegofutbol\\\\app.html\")",
+      "Bash(npm run build:*)"
     ]
   }
 }

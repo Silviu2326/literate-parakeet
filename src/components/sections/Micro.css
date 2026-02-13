@@ -1,0 +1,255 @@
+.micro-container {
+  min-height: 100vh;
+  background-color: #0D0D0D;
+}
+
+.micro-header {
+  background-color: #141414;
+  border-bottom: 1px solid #252525;
+  padding: 1rem;
+}
+
+.micro-back-button {
+  margin-bottom: 0.75rem;
+  color: #9CA3AF;
+  font-weight: bold;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.3s;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.micro-back-button:hover {
+  color: #00E676;
+}
+
+.micro-title-wrapper {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.micro-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  border: 4px solid #00E676;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  animation: pulse 2s infinite;
+}
+
+.micro-icon::before,
+.micro-icon::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: #00E676;
+  border-radius: 50%;
+}
+
+.micro-icon::before {
+  top: 50%;
+  left: 8px;
+  transform: translateY(-50%);
+}
+
+.micro-icon::after {
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(0, 230, 118, 0);
+  }
+}
+
+.micro-title {
+  color: white;
+  font-weight: 900;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.micro-content {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.micro-match-selector {
+  margin-bottom: 1rem;
+}
+
+.micro-match-select {
+  width: 100%;
+  background-color: #1F1F1F;
+  border: 2px solid #2D2D2D;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.micro-match-select:hover {
+  border-color: #00E676;
+  background-color: rgba(0, 230, 118, 0.05);
+}
+
+.micro-match-select:focus {
+  outline: none;
+  border-color: #00E676;
+  box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.1);
+}
+
+.micro-match-select option {
+  background-color: #1F1F1F;
+  color: white;
+  padding: 0.5rem;
+}
+
+.micro-match-card {
+  background-color: #141414;
+  border: 1px solid #252525;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.micro-match-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.micro-live-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #EF4444;
+  border-radius: 50%;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.micro-match-text {
+  color: white;
+  font-weight: bold;
+  font-size: 1.125rem;
+}
+
+.micro-match-time {
+  color: #9CA3AF;
+  font-size: 1rem;
+}
+
+.micro-answered-text {
+  color: #6B7280;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.micro-question-card {
+  background-color: #141414;
+  border: 1px solid #252525;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.micro-question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.micro-category {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #00E676;
+  font-weight: bold;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.micro-category-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.micro-points {
+  color: #FFA500;
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+.micro-question-text {
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.micro-time-input {
+  background-color: #1F1F1F;
+  border: 1px solid #2D2D2D;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  color: #6B7280;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.micro-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.micro-button {
+  background-color: #1F1F1F;
+  border: 2px solid #2D2D2D;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  color: #9CA3AF;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.micro-button:hover {
+  border-color: #00E676;
+  color: white;
+  background-color: rgba(0, 230, 118, 0.1);
+}
+
+.micro-button.selected {
+  border-color: #00E676;
+  background-color: rgba(0, 230, 118, 0.2);
+  color: white;
+}

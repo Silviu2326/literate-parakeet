@@ -11,12 +11,12 @@ import { getPositionLabel, GAME_RULES } from '../../domain/rules';
 
 export function SquadPage() {
   const { setView } = useFantasyStore();
-  const { 
-    starters, 
-    bench, 
-    captain, 
-    viceCaptain, 
-    formation, 
+  const {
+    starters,
+    bench,
+    captain,
+    viceCaptain,
+    formation,
     stats,
     setFormation,
     setCaptain,
@@ -27,30 +27,30 @@ export function SquadPage() {
   const { availableChips } = useChips();
   const [showFormationSelector, setShowFormationSelector] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
-  
+
   const gk = starters.filter(p => p.position === PlayerPosition.GK);
   const defs = starters.filter(p => p.position === PlayerPosition.DEF);
   const mids = starters.filter(p => p.position === PlayerPosition.MID);
   const fwds = starters.filter(p => p.position === PlayerPosition.FWD);
-  
+
   const allPlayers = [...starters, ...bench];
-  
+
   const toggleStarter = (playerId: string) => {
     const player = allPlayers.find(p => p.id === playerId);
     if (!player) return;
-    
-    const newStarters = player.isStarter 
+
+    const newStarters = player.isStarter
       ? starters.filter(p => p.id !== playerId).map(p => p.id)
       : [...starters.map(p => p.id), playerId];
-    
+
     if (!player.isStarter && starters.length >= 11) {
       alert('Ya tienes 11 titulares');
       return;
     }
-    
+
     setStarters(newStarters);
   };
-  
+
   return (
     <MobileLayout>
       <div style={{ paddingBottom: 100 }}>
@@ -83,7 +83,7 @@ export function SquadPage() {
             ) : null
           }
         />
-        
+
         {/* RESTO DEL CONTENIDO IGUAL */}
         {stats.total > 0 && (
           <div style={{
@@ -106,7 +106,7 @@ export function SquadPage() {
                 transition: 'width var(--transition-base)',
               }} />
             </div>
-            
+
             {/* INDICADORES DE CAPITANES */}
             <div style={{
               display: 'flex',
@@ -114,74 +114,157 @@ export function SquadPage() {
               marginBottom: 'var(--space-3)',
               justifyContent: 'center',
             }}>
-              <CaptainBadge 
-                player={captain} 
-                type="captain" 
+              <CaptainBadge
+                player={captain}
+                type="captain"
                 onClick={() => captain && setSelectedPlayerId(captain.id)}
               />
-              <CaptainBadge 
-                player={viceCaptain} 
-                type="vice" 
+              <CaptainBadge
+                player={viceCaptain}
+                type="vice"
                 onClick={() => viceCaptain && setSelectedPlayerId(viceCaptain.id)}
               />
             </div>
-            
+
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: 'var(--space-3)',
+              gap: 'var(--space-2)',
               textAlign: 'center',
             }}>
-              <SquadStat 
-                label="Porteros" 
-                current={stats.byPosition[PlayerPosition.GK]} 
+              <SquadStat
+                label="Porteros"
+                emoji="🧤"
+                current={stats.byPosition[PlayerPosition.GK]}
                 required={2}
               />
-              <SquadStat 
-                label="Defensas" 
-                current={stats.byPosition[PlayerPosition.DEF]} 
+              <SquadStat
+                label="Defensas"
+                emoji="🛡️"
+                current={stats.byPosition[PlayerPosition.DEF]}
                 required={4}
               />
-              <SquadStat 
-                label="Medios" 
-                current={stats.byPosition[PlayerPosition.MID]} 
+              <SquadStat
+                label="Medios"
+                emoji="⚙️"
+                current={stats.byPosition[PlayerPosition.MID]}
                 required={4}
               />
-              <SquadStat 
-                label="Delanteros" 
-                current={stats.byPosition[PlayerPosition.FWD]} 
+              <SquadStat
+                label="Delanteros"
+                emoji="⚡"
+                current={stats.byPosition[PlayerPosition.FWD]}
                 required={2}
               />
             </div>
           </div>
         )}
-        
+
         {/* CAMPO DE JUEGO */}
         {stats.total > 0 ? (
           <div style={{
-            padding: 'var(--space-4)',
-            background: 'linear-gradient(180deg, #1a3a1a 0%, #0d280d 100%)',
-            minHeight: 350,
+            padding: 'var(--space-6) var(--space-4)',
+            background: 'linear-gradient(180deg, #1a4d1a 0%, #0f3a0f 50%, #0a2a0a 100%)',
+            minHeight: 500,
             position: 'relative',
+            overflow: 'hidden',
           }}>
+            {/* Patrón de césped */}
             <div style={{
               position: 'absolute',
-              top: '10%',
-              left: '10%',
-              right: '10%',
-              bottom: '10%',
-              border: '2px solid rgba(255,255,255,0.2)',
-              borderRadius: 'var(--radius-xl)',
+              inset: 0,
+              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(0,0,0,0.03) 40px, rgba(0,0,0,0.03) 80px)',
+              opacity: 0.5,
             }} />
-            
+
+            {/* Líneas del campo */}
+            <svg
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+              }}
+              viewBox="0 0 100 140"
+              preserveAspectRatio="none"
+            >
+              {/* Borde exterior */}
+              <rect
+                x="5" y="5" width="90" height="130"
+                fill="none"
+                stroke="rgba(255,255,255,0.25)"
+                strokeWidth="0.3"
+                rx="2"
+              />
+
+              {/* Línea de medio campo */}
+              <line
+                x1="5" y1="70" x2="95" y2="70"
+                stroke="rgba(255,255,255,0.25)"
+                strokeWidth="0.3"
+              />
+
+              {/* Círculo central */}
+              <circle
+                cx="50" cy="70" r="8"
+                fill="none"
+                stroke="rgba(255,255,255,0.25)"
+                strokeWidth="0.3"
+              />
+              <circle
+                cx="50" cy="70" r="0.5"
+                fill="rgba(255,255,255,0.3)"
+              />
+
+              {/* Área grande superior */}
+              <rect
+                x="20" y="5" width="60" height="20"
+                fill="none"
+                stroke="rgba(255,255,255,0.25)"
+                strokeWidth="0.3"
+              />
+
+              {/* Área chica superior */}
+              <rect
+                x="35" y="5" width="30" height="10"
+                fill="none"
+                stroke="rgba(255,255,255,0.25)"
+                strokeWidth="0.3"
+              />
+
+              {/* Área grande inferior */}
+              <rect
+                x="20" y="115" width="60" height="20"
+                fill="none"
+                stroke="rgba(255,255,255,0.25)"
+                strokeWidth="0.3"
+              />
+
+              {/* Área chica inferior */}
+              <rect
+                x="35" y="125" width="30" height="10"
+                fill="none"
+                stroke="rgba(255,255,255,0.25)"
+                strokeWidth="0.3"
+              />
+
+              {/* Punto de penal superior */}
+              <circle cx="50" cy="15" r="0.5" fill="rgba(255,255,255,0.3)" />
+
+              {/* Punto de penal inferior */}
+              <circle cx="50" cy="125" r="0.5" fill="rgba(255,255,255,0.3)" />
+            </svg>
+
+            {/* Jugadores */}
             <div style={{
               position: 'relative',
               zIndex: 10,
               height: '100%',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between',
-              padding: 'var(--space-6) 0',
+              justifyContent: 'space-around',
+              padding: 'var(--space-8) 0',
+              minHeight: 450,
             }}>
               <PlayerLine players={fwds} onPlayerClick={setSelectedPlayerId} />
               <PlayerLine players={mids} onPlayerClick={setSelectedPlayerId} />
@@ -226,7 +309,7 @@ export function SquadPage() {
             </button>
           </div>
         )}
-        
+
         {/* INFORMACIÓN DEL EQUIPO */}
         {stats.total > 0 && (
           <div style={{ padding: 'var(--space-4)' }}>
@@ -244,7 +327,7 @@ export function SquadPage() {
                   }}>
                     Restricción de selecciones
                   </span>
-                  <Badge 
+                  <Badge
                     variant={stats.nationsWithTwo > GAME_RULES.NATIONS_WITH_DOUBLE ? 'error' : 'neutral'}
                     size="sm"
                   >
@@ -259,7 +342,7 @@ export function SquadPage() {
                 </p>
               </Card.Body>
             </Card>
-            
+
             <Card>
               <Card.Header>
                 <div style={{
@@ -288,8 +371,8 @@ export function SquadPage() {
                 ) : (
                   <div>
                     {allPlayers.map((player) => (
-                      <PlayerListItem 
-                        key={player.id} 
+                      <PlayerListItem
+                        key={player.id}
                         player={player}
                         isCaptain={captain?.id === player.id}
                         isVice={viceCaptain?.id === player.id}
@@ -300,7 +383,7 @@ export function SquadPage() {
                 )}
               </Card.Body>
             </Card>
-            
+
             {/* COMODINES */}
             {availableChips.length > 0 && (
               <Card style={{ marginTop: 'var(--space-4)' }}>
@@ -369,7 +452,7 @@ export function SquadPage() {
             )}
           </div>
         )}
-        
+
         {/* BOTÓN FLOTANTE */}
         {stats.total < 15 && (
           <button
@@ -397,16 +480,16 @@ export function SquadPage() {
             +
           </button>
         )}
-        
+
         {/* SELECTOR DE FORMACIÓN */}
         {showFormationSelector && (
-          <FormationSelector 
+          <FormationSelector
             currentFormation={formation}
             onClose={() => setShowFormationSelector(false)}
             onSelect={setFormation}
           />
         )}
-        
+
         {/* MODAL DE JUGADOR */}
         {selectedPlayerId && (
           <PlayerModal
@@ -419,6 +502,20 @@ export function SquadPage() {
           />
         )}
       </div>
+
+      {/* Estilos CSS para animaciones */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+          }
+        }
+      `}</style>
     </MobileLayout>
   );
 }
@@ -447,76 +544,148 @@ function PlayerLine({ players, onPlayerClick }: { players: any[]; onPlayerClick:
 function PlayerToken({ player, onClick }: { player: any; onClick: () => void }) {
   const isCaptain = player.isCaptain;
   const isVice = player.isViceCaptain;
-  
+
+  // Obtener iniciales del jugador
+  const getInitials = (name: string) => {
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return parts[0][0] + parts[parts.length - 1][0];
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
   return (
-    <div 
+    <div
       onClick={onClick}
       style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '4px',
+        gap: '6px',
         cursor: 'pointer',
+        transition: 'transform 0.2s',
       }}
+      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
     >
+      {/* Avatar del jugador */}
       <div style={{
-        width: 50,
-        height: 50,
-        borderRadius: '50%',
-        background: isCaptain 
-          ? 'linear-gradient(135deg, #FFD700 0%, #FFA000 100%)'
-          : isVice 
-            ? 'linear-gradient(135deg, #C0C0C0 0%, #808080 100%)'
-            : 'var(--bg-secondary)',
-        border: `3px solid ${isCaptain ? '#FFD700' : isVice ? '#C0C0C0' : 'var(--text-primary)'}`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 'var(--text-xl)',
-        boxShadow: 'var(--shadow-md)',
         position: 'relative',
+        width: 64,
+        height: 64,
       }}>
-        <span style={{ fontSize: '20px' }}>⚽</span>
-        
+        {/* Anillo externo (capitán/vice) */}
         {(isCaptain || isVice) && (
           <div style={{
             position: 'absolute',
-            bottom: -4,
-            right: -4,
-            width: 20,
-            height: 20,
+            inset: -4,
             borderRadius: '50%',
-            background: isCaptain ? '#FFD700' : '#C0C0C0',
+            background: isCaptain
+              ? 'linear-gradient(135deg, #FFD700 0%, #FFA000 100%)'
+              : 'linear-gradient(135deg, #E8E8E8 0%, #A0A0A0 100%)',
+            padding: 3,
+            animation: 'pulse 2s infinite',
+          }}>
+            <div style={{
+              width: '100%',
+              height: '100%',
+              borderRadius: '50%',
+              background: 'var(--bg-primary)',
+            }} />
+          </div>
+        )}
+
+        {/* Avatar principal */}
+        <div style={{
+          position: 'relative',
+          width: 64,
+          height: 64,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
+          border: '3px solid rgba(255,255,255,0.15)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '18px',
+          fontWeight: 'var(--font-black)',
+          color: '#fff',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1)',
+          overflow: 'hidden',
+        }}>
+          {/* Gradiente de fondo */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(135deg, rgba(0,230,118,0.2) 0%, rgba(0,200,83,0.1) 100%)',
+          }} />
+
+          {/* Iniciales */}
+          <span style={{
+            position: 'relative',
+            zIndex: 1,
+            fontSize: '20px',
+            fontWeight: 'var(--font-black)',
+            letterSpacing: '-1px',
+          }}>
+            {getInitials(player.name)}
+          </span>
+        </div>
+
+        {/* Badge de capitán/vice */}
+        {(isCaptain || isVice) && (
+          <div style={{
+            position: 'absolute',
+            top: -2,
+            right: -2,
+            width: 22,
+            height: 22,
+            borderRadius: '50%',
+            background: isCaptain
+              ? 'linear-gradient(135deg, #FFD700 0%, #FFA000 100%)'
+              : 'linear-gradient(135deg, #E8E8E8 0%, #A0A0A0 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '10px',
-            color: 'var(--bg-primary)',
-            fontWeight: 'bold',
+            fontSize: '11px',
+            color: isCaptain ? '#000' : '#fff',
+            fontWeight: 'var(--font-black)',
+            border: '2px solid var(--bg-primary)',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
           }}>
             {isCaptain ? 'C' : 'V'}
           </div>
         )}
       </div>
+
+      {/* Nombre y puntos en card */}
       <div style={{
-        fontSize: '10px',
-        fontWeight: 'var(--font-bold)',
-        color: 'white',
+        background: 'rgba(0,0,0,0.4)',
+        backdropFilter: 'blur(8px)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        borderRadius: '8px',
+        padding: '4px 8px',
         textAlign: 'center',
-        maxWidth: 60,
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+        minWidth: 70,
       }}>
-        {player.name.split(' ').pop()}
-      </div>
-      <div style={{
-        fontSize: '9px',
-        color: 'var(--color-primary)',
-        fontWeight: 'var(--font-bold)',
-      }}>
-        {player.points} pts
+        <div style={{
+          fontSize: '11px',
+          fontWeight: 'var(--font-bold)',
+          color: '#fff',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+          marginBottom: '2px',
+        }}>
+          {player.name.split(' ').pop()}
+        </div>
+        <div style={{
+          fontSize: '10px',
+          color: 'var(--color-primary)',
+          fontWeight: 'var(--font-bold)',
+        }}>
+          {player.points} pts
+        </div>
       </div>
     </div>
   );
@@ -524,23 +693,23 @@ function PlayerToken({ player, onClick }: { player: any; onClick: () => void }) 
 
 function CaptainBadge({ player, type, onClick }: { player: any; type: 'captain' | 'vice'; onClick?: () => void }) {
   return (
-    <div 
+    <div
       onClick={onClick}
       style={{
         display: 'flex',
         alignItems: 'center',
         gap: 'var(--space-2)',
         padding: 'var(--space-2) var(--space-3)',
-        background: type === 'captain' 
-          ? 'rgba(255, 214, 0, 0.15)' 
+        background: type === 'captain'
+          ? 'rgba(255, 214, 0, 0.15)'
           : 'rgba(192, 192, 192, 0.15)',
         borderRadius: 'var(--radius-full)',
         border: `1px solid ${type === 'captain' ? 'var(--color-accent)' : '#C0C0C0'}`,
         cursor: onClick ? 'pointer' : 'default',
       }}
     >
-      <Crown size={14} style={{ 
-        color: type === 'captain' ? 'var(--color-accent)' : '#C0C0C0' 
+      <Crown size={14} style={{
+        color: type === 'captain' ? 'var(--color-accent)' : '#C0C0C0'
       }} />
       <span style={{
         fontSize: 'var(--text-xs)',
@@ -562,31 +731,73 @@ function CaptainBadge({ player, type, onClick }: { player: any; type: 'captain' 
   );
 }
 
-function SquadStat({ label, current, required }: { label: string; current: number; required: number }) {
+function SquadStat({
+  label,
+  emoji,
+  current,
+  required
+}: {
+  label: string;
+  emoji: string;
+  current: number;
+  required: number
+}) {
   const isComplete = current >= required;
-  
+  const percentage = (current / required) * 100;
+
   return (
-    <div>
+    <div style={{
+      background: 'rgba(0,0,0,0.2)',
+      border: `1px solid ${isComplete ? 'rgba(0,230,118,0.3)' : 'rgba(255,255,255,0.1)'}`,
+      borderRadius: 'var(--radius-lg)',
+      padding: 'var(--space-3) var(--space-2)',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Barra de progreso de fondo */}
       <div style={{
-        fontSize: 'var(--text-lg)',
-        fontWeight: 'var(--font-black)',
-        color: isComplete ? 'var(--color-success)' : 'var(--text-primary)',
-      }}>
-        {current}/{required}
-      </div>
-      <div style={{
-        fontSize: '10px',
-        color: 'var(--text-tertiary)',
-        textTransform: 'uppercase',
-      }}>
-        {label}
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: `${percentage}%`,
+        background: isComplete
+          ? 'linear-gradient(180deg, rgba(0,230,118,0.15) 0%, rgba(0,230,118,0.05) 100%)'
+          : 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)',
+        transition: 'height 0.3s ease',
+      }} />
+
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{
+          fontSize: '20px',
+          marginBottom: '4px',
+        }}>
+          {emoji}
+        </div>
+        <div style={{
+          fontSize: 'var(--text-xl)',
+          fontWeight: 'var(--font-black)',
+          color: isComplete ? 'var(--color-success)' : 'var(--text-primary)',
+          marginBottom: '2px',
+        }}>
+          {current}/{required}
+        </div>
+        <div style={{
+          fontSize: '9px',
+          color: 'var(--text-tertiary)',
+          textTransform: 'uppercase',
+          fontWeight: 'var(--font-semibold)',
+          letterSpacing: '0.5px',
+        }}>
+          {label}
+        </div>
       </div>
     </div>
   );
 }
 
-function PlayerListItem({ player, isCaptain, isVice, onClick }: { 
-  player: any; 
+function PlayerListItem({ player, isCaptain, isVice, onClick }: {
+  player: any;
   isCaptain: boolean;
   isVice: boolean;
   onClick: () => void;
@@ -608,9 +819,9 @@ function PlayerListItem({ player, isCaptain, isVice, onClick }: {
         width: 40,
         height: 40,
         borderRadius: '50%',
-        background: isCaptain 
+        background: isCaptain
           ? 'linear-gradient(135deg, #FFD700 0%, #FFA000 100%)'
-          : isVice 
+          : isVice
             ? 'linear-gradient(135deg, #C0C0C0 0%, #808080 100%)'
             : 'var(--bg-tertiary)',
         border: `2px solid ${isCaptain ? '#FFD700' : isVice ? '#C0C0C0' : 'transparent'}`,
@@ -621,7 +832,7 @@ function PlayerListItem({ player, isCaptain, isVice, onClick }: {
       }}>
         ⚽
       </div>
-      
+
       <div style={{ flex: 1 }}>
         <div style={{
           display: 'flex',
@@ -652,23 +863,23 @@ function PlayerListItem({ player, isCaptain, isVice, onClick }: {
           <span style={{ color: 'var(--color-primary)' }}>{player.points} pts</span>
         </div>
       </div>
-      
+
       <ChevronRight size={18} style={{ color: 'var(--text-tertiary)' }} />
     </div>
   );
 }
 
-function FormationSelector({ 
-  currentFormation, 
-  onClose, 
-  onSelect 
-}: { 
-  currentFormation: string; 
+function FormationSelector({
+  currentFormation,
+  onClose,
+  onSelect
+}: {
+  currentFormation: string;
   onClose: () => void;
   onSelect: (formation: any) => void;
 }) {
   const formations = ['4-3-3', '4-4-2', '4-2-3-1', '3-5-2', '3-4-3', '5-3-2', '5-4-1'] as const;
-  
+
   return (
     <div style={{
       position: 'fixed',
@@ -714,7 +925,7 @@ function FormationSelector({
             <X size={24} />
           </button>
         </div>
-        
+
         <div style={{
           display: 'grid',
           gap: 'var(--space-3)',
@@ -733,11 +944,11 @@ function FormationSelector({
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: 'var(--space-4)',
-                  background: formation === currentFormation 
-                    ? 'rgba(0, 200, 83, 0.15)' 
+                  background: formation === currentFormation
+                    ? 'rgba(0, 200, 83, 0.15)'
                     : 'var(--bg-tertiary)',
-                  border: `1px solid ${formation === currentFormation 
-                    ? 'var(--color-primary)' 
+                  border: `1px solid ${formation === currentFormation
+                    ? 'var(--color-primary)'
                     : 'var(--border-primary)'}`,
                   borderRadius: 'var(--radius-lg)',
                   cursor: 'pointer',
@@ -746,8 +957,8 @@ function FormationSelector({
                 <div style={{
                   fontSize: 'var(--text-md)',
                   fontWeight: 'var(--font-bold)',
-                  color: formation === currentFormation 
-                    ? 'var(--color-primary)' 
+                  color: formation === currentFormation
+                    ? 'var(--color-primary)'
                     : 'var(--text-primary)',
                 }}>
                   {formation}
@@ -767,14 +978,14 @@ function FormationSelector({
   );
 }
 
-function PlayerModal({ 
-  player, 
-  onClose, 
-  onRemove, 
-  onToggleStarter, 
-  onSetCaptain, 
-  onSetViceCaptain 
-}: { 
+function PlayerModal({
+  player,
+  onClose,
+  onRemove,
+  onToggleStarter,
+  onSetCaptain,
+  onSetViceCaptain
+}: {
   player: any;
   onClose: () => void;
   onRemove: (id: string) => void;
@@ -825,7 +1036,7 @@ function PlayerModal({
             <X size={24} />
           </button>
         </div>
-        
+
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -862,7 +1073,7 @@ function PlayerModal({
             </div>
           </div>
         </div>
-        
+
         <div style={{
           display: 'grid',
           gap: 'var(--space-3)',
@@ -876,7 +1087,7 @@ function PlayerModal({
               onClose();
             }}
           />
-          
+
           {!player.isCaptain && (
             <ActionButton
               label="Designar capitán"
@@ -888,7 +1099,7 @@ function PlayerModal({
               }}
             />
           )}
-          
+
           {!player.isViceCaptain && !player.isCaptain && (
             <ActionButton
               label="Designar vicecapitán"
@@ -900,7 +1111,7 @@ function PlayerModal({
               }}
             />
           )}
-          
+
           <ActionButton
             label="Quitar del equipo"
             icon={<X size={18} />}
@@ -916,14 +1127,14 @@ function PlayerModal({
   );
 }
 
-function ActionButton({ 
-  label, 
-  icon, 
-  variant, 
-  onClick 
-}: { 
-  label: string; 
-  icon: React.ReactNode; 
+function ActionButton({
+  label,
+  icon,
+  variant,
+  onClick
+}: {
+  label: string;
+  icon: React.ReactNode;
   variant: 'primary' | 'accent' | 'secondary' | 'danger';
   onClick: () => void;
 }) {
@@ -933,7 +1144,7 @@ function ActionButton({
     secondary: { bg: 'var(--bg-tertiary)', text: 'var(--text-primary)' },
     danger: { bg: 'rgba(255, 61, 0, 0.2)', text: 'var(--color-error)' },
   };
-  
+
   return (
     <button
       onClick={onClick}

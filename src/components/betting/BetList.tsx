@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import type { Bet } from '../../types/index.ts';
-import { 
+import {
   ChevronLeft,
   Plus,
   TrendingUp,
@@ -17,14 +17,16 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { getFlagImage } from '../../utils/helpers';
+import { Header } from '../home/Header';
 
 interface BetListProps {
   bets: Bet[];
   onOpenModal: () => void;
   onNavigate?: (view: string) => void;
+  points: number;
 }
 
-export const BetList = ({ bets, onOpenModal, onNavigate }: BetListProps) => {
+export const BetList = ({ bets, onOpenModal, onNavigate, points }: BetListProps) => {
   const [filter, setFilter] = useState<'all' | 'pending' | 'won' | 'lost'>('all');
 
   // Calcular estadísticas
@@ -58,6 +60,9 @@ export const BetList = ({ bets, onOpenModal, onNavigate }: BetListProps) => {
       background: 'var(--bg-primary)',
       paddingBottom: 90,
     }}>
+      {/* Header Principal */}
+      <Header points={points} />
+
       {/* HEADER - CENTRADO */}
       <div style={{
         background: 'var(--bg-secondary)',
@@ -239,15 +244,15 @@ export const BetList = ({ bets, onOpenModal, onNavigate }: BetListProps) => {
           label="Match" 
           onClick={() => onNavigate?.('match')} 
         />
-        <BottomNavItem 
-          icon={<Trophy size={22} />} 
-          label="Ranking" 
-          onClick={() => onNavigate?.('ranking')} 
+        <BottomNavItem
+          icon={<Trophy size={22} />}
+          label="Ranking"
+          onClick={() => onNavigate?.('ranking')}
         />
-        <BottomNavItem 
-          icon={<MessageSquare size={22} />} 
-          label="IA" 
-          onClick={() => onNavigate?.('ai')} 
+        <BottomNavItem
+          icon={<MessageSquare size={22} />}
+          label="IA"
+          onClick={() => onNavigate?.('ai')}
         />
       </nav>
     </div>

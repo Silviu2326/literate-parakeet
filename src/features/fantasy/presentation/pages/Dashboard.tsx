@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Swords, ChevronRight, Flame, Trophy, TrendingUp, TrendingDown, Target } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
@@ -11,16 +11,30 @@ export function FantasyDashboard() {
   const { loadNations, loadPlayers, loadMatchdays, loadStandings, setView, currentMatchday } = useFantasy();
   const { stats: squadStats } = useSquad();
   const { myStanding, standings } = useRanking();
-  
+
   useEffect(() => {
     loadNations(MOCK_NATIONS);
     loadPlayers(MOCK_PLAYERS);
     loadMatchdays(MOCK_MATCHDAYS);
     loadStandings(MOCK_STANDINGS);
   }, []);
-  
-  const timeLeft = { hours: 48, minutes: 32, seconds: 15 };
-  
+
+  // Timer logic
+  const [totalSeconds, setTotalSeconds] = useState(48 * 3600 + 32 * 60 + 15);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTotalSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const timeLeft = { hours, minutes, seconds };
+
   return (
     <MobileLayout>
       <div style={{ paddingBottom: 100 }}>
@@ -29,7 +43,7 @@ export function FantasyDashboard() {
           title="FANTASY"
           onBack={() => window.location.href = '/'}
         />
-        
+
         {/* INFO JORNADA Y CONTADOR */}
         <div style={{
           background: 'var(--bg-secondary)',
@@ -58,7 +72,7 @@ export function FantasyDashboard() {
               FASE DE GRUPOS
             </span>
           </div>
-          
+
           {/* CONTADOR */}
           <div style={{
             display: 'flex',
@@ -80,7 +94,7 @@ export function FantasyDashboard() {
             }}>:</span>
             <TimeUnit value={timeLeft.seconds} label="SEG" />
           </div>
-          
+
           <div style={{
             textAlign: 'center',
             marginTop: 'var(--space-2)',
@@ -91,15 +105,15 @@ export function FantasyDashboard() {
             ⏰ CIERRE DE JORNADA
           </div>
         </div>
-        
+
         {/* CONTENIDO */}
         <div style={{ padding: 'var(--space-4)' }}>
-          
+
           {/* MI POSICIÓN */}
           {myStanding && (
-            <Card 
-              variant="elevated" 
-              style={{ 
+            <Card
+              variant="elevated"
+              style={{
                 marginBottom: 'var(--space-4)',
                 border: '2px solid var(--color-primary)',
               }}
@@ -172,7 +186,7 @@ export function FantasyDashboard() {
               </Card.Body>
             </Card>
           )}
-          
+
           {/* CLASIFICACIÓN */}
           <Card style={{ marginBottom: 'var(--space-4)' }}>
             <Card.Header>
@@ -217,8 +231,8 @@ export function FantasyDashboard() {
                       width: 32,
                       height: 32,
                       borderRadius: 'var(--radius-md)',
-                      background: standing.position <= 3 
-                        ? 'var(--color-accent)' 
+                      background: standing.position <= 3
+                        ? 'var(--color-accent)'
                         : 'var(--bg-tertiary)',
                       display: 'flex',
                       alignItems: 'center',
@@ -229,7 +243,7 @@ export function FantasyDashboard() {
                     }}>
                       {standing.position}
                     </div>
-                    
+
                     <div style={{ flex: 1 }}>
                       <div style={{
                         fontSize: 'var(--text-sm)',
@@ -239,7 +253,7 @@ export function FantasyDashboard() {
                         {standing.userName} {standing.isMe && '(Tú)'}
                       </div>
                     </div>
-                    
+
                     <div style={{ textAlign: 'right' }}>
                       <div style={{
                         fontSize: 'var(--text-md)',
@@ -254,7 +268,7 @@ export function FantasyDashboard() {
                         justifyContent: 'flex-end',
                         gap: 2,
                         fontSize: '10px',
-                        color: standing.previousPosition > standing.position 
+                        color: standing.previousPosition > standing.position
                           ? 'var(--color-success)'
                           : standing.previousPosition < standing.position
                             ? 'var(--color-error)'
@@ -274,9 +288,9 @@ export function FantasyDashboard() {
               </div>
             </Card.Body>
           </Card>
-          
+
           {/* DUELOS */}
-          <Card 
+          <Card
             variant="interactive"
             onClick={() => setView('duels')}
             style={{ marginBottom: 'var(--space-4)' }}
@@ -298,7 +312,7 @@ export function FantasyDashboard() {
                 }}>
                   <Swords size={28} color="white" />
                 </div>
-                
+
                 <div style={{ flex: 1 }}>
                   <div style={{
                     fontSize: 'var(--text-lg)',
@@ -315,14 +329,14 @@ export function FantasyDashboard() {
                     Reta a tus amigos y apuesta puntos
                   </div>
                 </div>
-                
+
                 <ChevronRight size={24} style={{ color: 'var(--color-primary)' }} />
               </div>
             </Card.Body>
           </Card>
-          
+
           {/* MI EQUIPO */}
-          <Card 
+          <Card
             variant="interactive"
             onClick={() => setView('squad')}
           >
@@ -351,7 +365,7 @@ export function FantasyDashboard() {
                   {squadStats.total}/15
                 </Badge>
               </div>
-              
+
               <div style={{
                 height: 8,
                 background: 'var(--bg-elevated)',
@@ -365,7 +379,7 @@ export function FantasyDashboard() {
                   borderRadius: 'var(--radius-full)',
                 }} />
               </div>
-              
+
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',

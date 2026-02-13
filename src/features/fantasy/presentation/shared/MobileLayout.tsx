@@ -1,22 +1,29 @@
 import type { ReactNode } from 'react';
-import { Home, Users, Search, Target } from 'lucide-react';
+import { Home, FileText, Tv, Trophy, MessageSquare } from 'lucide-react';
 import { useFantasyStore } from '../../application/store/fantasyStore';
 
 interface MobileLayoutProps {
   children: ReactNode;
+  onNavigate?: (view: string) => void;
 }
 
-export function MobileLayout({ children }: MobileLayoutProps) {
+export function MobileLayout({ children, onNavigate }: MobileLayoutProps) {
   const selectedView = useFantasyStore((state) => state.selectedView);
   const setView = useFantasyStore((state) => state.setView);
-  
+
   // No mostrar navbar en ciertas vistas
   const hideNavbar = selectedView === 'duels' || selectedView === 'user-detail';
-  
-  const handleNavigation = (view: 'dashboard' | 'squad' | 'players' | 'predictions') => {
-    setView(view);
+
+  const handleNavigation = (view: string) => {
+    // Si hay onNavigate externo, usarlo (para navegación global)
+    if (onNavigate) {
+      onNavigate(view);
+    } else {
+      // Sino, usar el store interno de fantasy
+      setView(view as any);
+    }
   };
-  
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -24,8 +31,8 @@ export function MobileLayout({ children }: MobileLayoutProps) {
       paddingBottom: hideNavbar ? 0 : 80,
     }}>
       {children}
-      
-      {/* NAVEGACIÓN INFERIOR - ORDEN: INICIO, MI EQUIPO, JUGADORES, PREDICCIONES */}
+
+      {/* NAVEGACIÓN INFERIOR - ORDEN: INICIO, MIS APUESTAS, MATCH, RANKING, IA */}
       {!hideNavbar && (
         <nav style={{
           position: 'fixed',
@@ -38,32 +45,38 @@ export function MobileLayout({ children }: MobileLayoutProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-around',
-          padding: '0 var(--space-4)',
+          padding: '0 var(--space-2)',
           zIndex: 100,
         }}>
           <NavItem
-            icon={<Home size={24} />}
+            icon={<Home size={22} />}
             label="Inicio"
             isActive={selectedView === 'dashboard'}
             onClick={() => handleNavigation('dashboard')}
           />
           <NavItem
-            icon={<Users size={24} />}
-            label="Mi Equipo"
-            isActive={selectedView === 'squad'}
-            onClick={() => handleNavigation('squad')}
+            icon={<FileText size={22} />}
+            label="Mis Apuestas"
+            isActive={selectedView === 'bets'}
+            onClick={() => handleNavigation('bets')}
           />
           <NavItem
-            icon={<Search size={24} />}
-            label="Jugadores"
-            isActive={selectedView === 'players'}
-            onClick={() => handleNavigation('players')}
+            icon={<Tv size={22} />}
+            label="Match"
+            isActive={selectedView === 'match'}
+            onClick={() => handleNavigation('match')}
           />
           <NavItem
-            icon={<Target size={24} />}
-            label="Predicciones"
-            isActive={selectedView === 'predictions'}
-            onClick={() => handleNavigation('predictions')}
+            icon={<Trophy size={22} />}
+            label="Ranking"
+            isActive={selectedView === 'ranking'}
+            onClick={() => handleNavigation('ranking')}
+          />
+          <NavItem
+            icon={<MessageSquare size={22} />}
+            label="IA"
+            isActive={selectedView === 'ai'}
+            onClick={() => handleNavigation('ai')}
           />
         </nav>
       )}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { 
+import {
   ChevronLeft,
   Trophy,
   TrendingUp,
@@ -10,9 +10,11 @@ import {
   Zap,
   Search
 } from 'lucide-react';
+import { Header } from '../home/Header';
 
 interface RankingProps {
   onNavigate: (view: string) => void;
+  points: number;
 }
 
 interface Player {
@@ -71,7 +73,7 @@ const CURRENT_USER_GLOBAL: Player = { rank: 47, name: 'Tú', points: 1847, strea
 const CURRENT_USER_FRIENDS: Player = { rank: 8, name: 'Tú', points: 1847, streak: 3, country: 'España', avatar: '👤', isMe: true };
 const CURRENT_USER_WEEKLY: Player = { rank: 12, name: 'Tú', points: 234, streak: 2, country: 'España', avatar: '👤', isMe: true };
 
-export const Ranking = ({ onNavigate }: RankingProps) => {
+export const Ranking = ({ onNavigate, points }: RankingProps) => {
   const [activeTab, setActiveTab] = useState<'global' | 'friends' | 'weekly'>('global');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -91,8 +93,12 @@ export const Ranking = ({ onNavigate }: RankingProps) => {
     <div style={{
       minHeight: '100vh',
       background: 'var(--bg-primary)',
-      paddingBottom: 90,
+      paddingBottom: 0,
     }}>
+      {/* Header Principal */}
+      <Header points={points} />
+
+      <div style={{ paddingBottom: 90 }}>
       {/* HEADER - CENTRADO */}
       <div style={{
         background: 'var(--bg-secondary)',
@@ -396,6 +402,7 @@ export const Ranking = ({ onNavigate }: RankingProps) => {
         <BottomNavItem icon={<Trophy size={22} />} label="Ranking" isActive onClick={() => {}} />
         <BottomNavItem icon={<MessageSquare size={22} />} label="IA" onClick={() => onNavigate('ai')} />
       </nav>
+      </div>
     </div>
   );
 };

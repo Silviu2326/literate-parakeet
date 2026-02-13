@@ -1,66 +1,150 @@
 import { MATCHES } from '../../data/matches';
 import { getFlagImage } from '../../utils/helpers';
+import { Header } from '../home/Header';
+import './Matches.css';
 
 interface MatchesProps {
   onNavigate: (view: string) => void;
+  points: number;
 }
 
-export const Matches = ({ onNavigate }: MatchesProps) => {
+export const Matches = ({ onNavigate, points }: MatchesProps) => {
+  // Calcular estadísticas
+  const totalMatches = MATCHES.length;
+  const liveMatches = MATCHES.filter(m => m.live).length;
+  const groupStageMatches = MATCHES.filter(m => m.stage === 'groups').length;
+
   return (
-    <div className="min-h-screen bg-[#0D0D0D]">
-      {/* Header */}
-      <div className="bg-[#141414] border-b border-[#252525] px-4 py-4">
+    <div className="matches-container">
+      {/* Header Principal */}
+      <Header points={points} />
+
+      {/* Header Visual */}
+      <div className="matches-hero">
+        {/* Background Glows */}
+        <div className="matches-hero-glow" />
+
+        {/* Back Button flotante en esquina izquierda */}
         <button
           onClick={() => onNavigate('dashboard')}
-          className="mb-3 text-gray-400 hover:text-[#00E676] font-bold text-sm flex items-center gap-2 transition-colors"
+          className="matches-back-button"
         >
-          ← Volver al inicio
+          <div className="matches-back-button-circle">
+            <span className="text-2xl">←</span>
+          </div>
+          <span className="hidden md:block text-xs font-bold tracking-widest uppercase">Volver</span>
         </button>
-        <h1 className="text-white font-black text-2xl mb-1">Partidos</h1>
-        <p className="text-gray-500 text-sm">Todos los partidos del Mundial 2026</p>
+
+        <div className="max-w-7xl mx-auto relative">
+          {/* Centered Hero Content */}
+          <div className="matches-hero-content">
+            {/* Main Icon (Visual Anchor) */}
+            <div className="matches-icon-container">
+              <div className="matches-icon-glow" />
+              <div className="matches-icon-box">
+                <svg viewBox="0 0 24 24" className="w-10 h-10 text-[#00E676] fill-none stroke-current stroke-2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+              </div>
+            </div>
+
+            <div className="matches-title-section">
+              <h1 className="matches-main-title">
+                Partidos
+              </h1>
+              <div className="matches-badges">
+                <span className="matches-badge matches-badge-gray">
+                  Mundial 2026
+                </span>
+                <span className="matches-badge matches-badge-green">
+                  {totalMatches} Encuentros
+                </span>
+                {liveMatches > 0 && (
+                  <span className="matches-badge matches-badge-green">
+                    {liveMatches} En Vivo
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Visual Stats Bar */}
+            <div className="matches-stats-bar">
+              <div className="matches-stats-container">
+                <div className="matches-stat">
+                  <div className="matches-stat-value matches-stat-value-green">{totalMatches}</div>
+                  <div className="matches-stat-label">Total Partidos</div>
+                </div>
+                <div className="matches-stat-divider" />
+                <div className="matches-stat">
+                  <div className="matches-stat-value matches-stat-value-white">{groupStageMatches}</div>
+                  <div className="matches-stat-label">Fase Grupos</div>
+                </div>
+                <div className="matches-stat-divider" />
+                <div className="matches-stat">
+                  <div className="matches-stat-value matches-stat-value-white">16</div>
+                  <div className="matches-stat-label">Sedes</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto p-4">
-        <div className="grid gap-3">
+      <div className="matches-content">
+        <div className="matches-list">
           {MATCHES.map((match) => (
-            <div
-              key={match.id}
-              className="bg-[#141414] border border-[#252525] rounded-xl p-4 hover:border-[#00E676] transition-colors cursor-pointer"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 flex-1">
-                  <img
-                    src={getFlagImage(match.h, 40)}
-                    alt={match.h}
-                    className="w-10 h-7 rounded object-cover"
-                    onError={(e) => e.currentTarget.style.display = 'none'}
-                  />
-                  <span className="text-white font-bold">{match.h}</span>
+            <div key={match.id} className="match-card">
+              {/* Fecha y ubicación header */}
+              <div className="match-card-header">
+                <div className="match-card-header-content">
+                  <span className="match-date">{match.date}</span>
+                  <span className="match-city">{match.city}</span>
                 </div>
+              </div>
 
-                <div className="text-center px-4">
-                  <div className="text-gray-500 text-xs mb-1">{match.date}</div>
-                  <div className="text-white font-black text-lg">
-                    {match.live ? `${match.hS || 0} - ${match.aS || 0}` : match.time}
+              {/* Match info */}
+              <div className="match-card-body">
+                <div className="match-teams">
+                  {/* Equipo local */}
+                  <div className="match-team">
+                    <img
+                      src={getFlagImage(match.h, 60)}
+                      alt={match.h}
+                      className="match-flag"
+                      onError={(e) => e.currentTarget.style.display = 'none'}
+                    />
+                    <span className="match-team-name">{match.h}</span>
                   </div>
-                  <div className="text-gray-600 text-xs">{match.city}</div>
-                  {match.live && (
-                    <div className="flex items-center gap-1 justify-center mt-1">
-                      <span className="w-1.5 h-1.5 bg-[#FF4444] rounded-full animate-pulse"></span>
-                      <span className="text-[#FF4444] text-xs font-bold">EN VIVO {match.min}</span>
-                    </div>
-                  )}
-                </div>
 
-                <div className="flex items-center gap-3 flex-1 justify-end">
-                  <span className="text-white font-bold">{match.a}</span>
-                  <img
-                    src={getFlagImage(match.a, 40)}
-                    alt={match.a}
-                    className="w-10 h-7 rounded object-cover"
-                    onError={(e) => e.currentTarget.style.display = 'none'}
-                  />
+                  {/* Score/Time */}
+                  <div className="match-score-container">
+                    {match.live ? (
+                      <>
+                        <div className="match-score">
+                          {match.hS || 0} - {match.aS || 0}
+                        </div>
+                        <div className="match-live-badge">
+                          <span className="match-live-dot"></span>
+                          <span className="match-live-text">EN VIVO {match.min}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="match-time">{match.time}</div>
+                    )}
+                  </div>
+
+                  {/* Equipo visitante */}
+                  <div className="match-team match-team-away">
+                    <span className="match-team-name">{match.a}</span>
+                    <img
+                      src={getFlagImage(match.a, 60)}
+                      alt={match.a}
+                      className="match-flag"
+                      onError={(e) => e.currentTarget.style.display = 'none'}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

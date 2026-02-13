@@ -1,28 +1,260 @@
+import { useState, useRef, useEffect } from 'react';
+import { Home, FileText, Tv, Trophy, MessageSquare, Send } from 'lucide-react';
+import { Header } from '../home/Header';
+import './AI.css';
+
 interface AIProps {
   onNavigate: (view: string) => void;
+  points: number;
 }
 
-export const AI = ({ onNavigate }: AIProps) => {
+interface Message {
+  id: number;
+  text: string;
+  sender: 'user' | 'ai';
+  timestamp: Date;
+}
+
+const AI_RESPONSES: { [key: string]: string } = {
+  "¿Quién gana México vs Sudáfrica?": `México ventaja anfitrión:
+• Altitud 2.240m
+• 78% victorias en casa
+Predicción: México 2-1 (71%)`,
+  "¿Favorito al título?": `Brasil es el favorito principal:
+• 5 Copas del Mundo ganadas
+• Plantel más valorado (€1.2B)
+• 68% posesión promedio
+Predicción: Brasil campeón (45%)`,
+  "default": `Análisis en proceso:
+• Revisando estadísticas
+• Comparando históricos
+• Calculando probabilidades
+Te recomiendo analizar más variables`,
+};
+
+const SUGGESTED_QUESTIONS = [
+  "¿Quién gana México vs Sudáfrica?",
+  "¿Favorito al título?",
+];
+
+export const AI = ({ onNavigate, points }: AIProps) => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToTop = () => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
+
+  const simulateAIResponse = (userMessage: string) => {
+    setIsTyping(true);
+
+    setTimeout(() => {
+      const response = AI_RESPONSES[userMessage] || AI_RESPONSES["default"];
+
+      const aiMessage: Message = {
+        id: Date.now(),
+        text: response,
+        sender: 'ai',
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+      setIsTyping(false);
+    }, 1500 + Math.random() * 1000);
+  };
+
+  const handleSendMessage = (text?: string) => {
+    const messageText = text || inputValue.trim();
+
+    if (!messageText) return;
+
+    setShowSuggestions(false);
+
+    const userMessage: Message = {
+      id: Date.now(),
+      text: messageText,
+      sender: 'user',
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue('');
+    simulateAIResponse(messageText);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const handleSuggestionClick = (question: string) => {
+    handleSendMessage(question);
+  };
+
   return (
-    <div className="min-h-screen bg-[#0D0D0D]">
-      <div className="bg-[#141414] border-b border-[#252525] px-4 py-4">
-        <button
-          onClick={() => onNavigate('dashboard')}
-          className="mb-3 text-gray-400 hover:text-[#00E676] font-bold text-sm flex items-center gap-2 transition-colors"
-        >
-          ← Volver al inicio
-        </button>
-        <h1 className="text-white font-black text-2xl mb-1">🤖 IA Coach</h1>
-        <p className="text-gray-500 text-sm">Asistente inteligente para tus predicciones</p>
+    <>
+      {/* Header Principal */}
+      <Header points={points} />
+
+      <div className="ai-container">
+        {/* Back Button - Top Left */}
+        <button onClick={() => onNavigate('dashboard')} className="ai-back-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M19 12H5M5 12L12 19M5 12L12 5"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      {/* Header */}
+      <div className="ai-header">
+        <div className="ai-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <path
+              d="M8 15C8 11.6863 10.6863 9 14 9H26C29.3137 9 32 11.6863 32 15V23C32 26.3137 29.3137 29 26 29H14C10.6863 29 8 26.3137 8 23V15Z"
+              stroke="#00E676"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+            <circle cx="16" cy="18" r="1.5" fill="#00E676" />
+            <circle cx="24" cy="18" r="1.5" fill="#00E676" />
+            <path
+              d="M16 24C16 24 18 26 20 26C22 26 24 24 24 24"
+              stroke="#00E676"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
+        <h1 className="ai-header-title">Asistente IA</h1>
       </div>
 
-      <div className="max-w-7xl mx-auto p-4">
-        <div className="bg-[#141414] border border-[#252525] rounded-2xl p-8 text-center">
-          <div className="text-6xl mb-4">🤖</div>
-          <h2 className="text-white font-bold text-xl mb-2">IA Coach</h2>
-          <p className="text-gray-400 text-sm mb-6">Próximamente disponible</p>
+      {/* Messages or Suggestions */}
+      <div className="ai-content" ref={messagesContainerRef}>
+        {showSuggestions && messages.length === 0 ? (
+          <div className="ai-suggestions">
+            {SUGGESTED_QUESTIONS.map((question) => (
+              <button
+                key={question}
+                onClick={() => handleSuggestionClick(question)}
+                className="ai-suggestion-card"
+              >
+                {question}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="ai-messages">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`ai-msg ${message.sender === 'user' ? 'ai-msg-user' : 'ai-msg-ai'}`}
+              >
+                <div className="ai-msg-bubble">
+                  {message.text.split('\n').map((line, i) => (
+                    <div key={i}>{line}</div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {isTyping && (
+              <div className="ai-msg ai-msg-ai">
+                <div className="ai-msg-bubble ai-typing">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+        )}
+      </div>
+
+      {/* Scroll to top button */}
+      {messages.length > 0 && (
+        <button onClick={scrollToTop} className="ai-scroll-top">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 19V5M12 5L5 12M12 5L19 12"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      )}
+
+      {/* Input Area with Send Button */}
+      <div className="ai-input-area">
+        <div className="ai-input-wrapper">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Pregunta..."
+            className="ai-input-field"
+            disabled={isTyping}
+          />
+          <button
+            onClick={() => handleSendMessage()}
+            disabled={!inputValue.trim() || isTyping}
+            className="ai-send-button"
+            aria-label="Enviar mensaje"
+          >
+            <Send size={20} />
+          </button>
         </div>
       </div>
-    </div>
+
+      {/* Bottom Navigation Tabs */}
+      <nav className="ai-bottom-nav">
+        <button onClick={() => onNavigate('dashboard')} className="ai-nav-item">
+          <Home size={22} />
+          <span>Inicio</span>
+        </button>
+        <button onClick={() => onNavigate('bets')} className="ai-nav-item">
+          <FileText size={22} />
+          <span>Mis Apuestas</span>
+        </button>
+        <button onClick={() => onNavigate('match')} className="ai-nav-item">
+          <Tv size={22} />
+          <span>Match</span>
+        </button>
+        <button onClick={() => onNavigate('ranking')} className="ai-nav-item">
+          <Trophy size={22} />
+          <span>Ranking</span>
+        </button>
+        <button onClick={() => onNavigate('ai')} className="ai-nav-item ai-nav-item-active">
+          <MessageSquare size={22} />
+          <span>IA</span>
+        </button>
+      </nav>
+      </div>
+    </>
   );
 };

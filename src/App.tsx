@@ -164,33 +164,33 @@ function App() {
           />
         );
       case 'match':
-        return <MatchCenter onNavigate={handleNavigate} />;
+        return <MatchCenter onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'matches':
-        return <Matches onNavigate={handleNavigate} />;
+        return <Matches onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'groups':
-        return <Groups onNavigate={handleNavigate} />;
+        return <Groups onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'selections':
-        return <Teams onNavigate={handleNavigate} />;
+        return <Teams onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'venues':
-        return <Venues onNavigate={handleNavigate} />;
+        return <Venues onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'tactics':
-        return <TacticsMode onNavigate={handleNavigate} />;
+        return <TacticsMode onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'ranking':
-        return <Ranking onNavigate={handleNavigate} />;
+        return <Ranking onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'trivia':
-        return <Trivia onNavigate={handleNavigate} />;
+        return <Trivia onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'ai':
-        return <AI onNavigate={handleNavigate} />;
+        return <AI onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'news':
-        return <News onNavigate={handleNavigate} />;
+        return <News onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'stories':
-        return <Stories onNavigate={handleNavigate} />;
+        return <Stories onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'micro':
-        return <Micro onNavigate={handleNavigate} />;
+        return <Micro onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'party':
-        return <Party onNavigate={handleNavigate} />;
+        return <Party onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'premium':
-        return <Premium onNavigate={handleNavigate} />;
+        return <Premium onNavigate={handleNavigate} points={fantasyState.pts} />;
       case 'fantasy':
       case 'hub':
       case 'squad':
@@ -214,6 +214,7 @@ function App() {
             bets={bets}
             onOpenModal={() => setBetModalOpen(true)}
             onNavigate={handleNavigate}
+            points={fantasyState.pts}
           />
         );
       default:

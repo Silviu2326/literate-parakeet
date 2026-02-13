@@ -1,10 +1,14 @@
+import { Header } from '../home/Header';
+
 interface TriviaProps {
   onNavigate: (view: string) => void;
+  points: number;
 }
 
-export const Trivia = ({ onNavigate }: TriviaProps) => {
+export const Trivia = ({ onNavigate, points }: TriviaProps) => {
   return (
     <div className="min-h-screen bg-[#0D0D0D]">
+      <Header points={points} />
       <div className="bg-[#141414] border-b border-[#252525] px-4 py-4">
         <button
           onClick={() => onNavigate('dashboard')}
