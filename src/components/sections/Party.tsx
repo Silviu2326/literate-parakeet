@@ -32,7 +32,6 @@ export const Party = ({ onNavigate, points }: PartyProps) => {
   ]);
   const [newMessage, setNewMessage] = useState('');
   const [viewers, setViewers] = useState(143);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 

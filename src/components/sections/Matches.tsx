@@ -12,7 +12,7 @@ export const Matches = ({ onNavigate, points }: MatchesProps) => {
   // Calcular estadísticas
   const totalMatches = MATCHES.length;
   const liveMatches = MATCHES.filter(m => m.live).length;
-  const groupStageMatches = MATCHES.filter(m => m.stage === 'groups').length;
+  const groupStageMatches = MATCHES.filter(m => m.g).length;
 
   return (
     <div className="matches-container">

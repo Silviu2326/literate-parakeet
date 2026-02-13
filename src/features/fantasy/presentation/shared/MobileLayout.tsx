@@ -57,13 +57,13 @@ export function MobileLayout({ children, onNavigate }: MobileLayoutProps) {
           <NavItem
             icon={<FileText size={22} />}
             label="Mis Apuestas"
-            isActive={selectedView === 'bets'}
+            isActive={false}
             onClick={() => handleNavigation('bets')}
           />
           <NavItem
             icon={<Tv size={22} />}
             label="Match"
-            isActive={selectedView === 'match'}
+            isActive={false}
             onClick={() => handleNavigation('match')}
           />
           <NavItem
@@ -75,7 +75,7 @@ export function MobileLayout({ children, onNavigate }: MobileLayoutProps) {
           <NavItem
             icon={<MessageSquare size={22} />}
             label="IA"
-            isActive={selectedView === 'ai'}
+            isActive={false}
             onClick={() => handleNavigation('ai')}
           />
         </nav>

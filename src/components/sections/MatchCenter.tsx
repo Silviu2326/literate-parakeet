@@ -196,7 +196,7 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
 
       // Mostrar tarjetas con animación
       if (lastNewEvent.type === 'yellow' || lastNewEvent.type === 'red') {
-        setShowCard({ type: lastNewEvent.type, player: lastNewEvent.player });
+        setShowCard({ type: lastNewEvent.type, player: lastNewEvent.player || 'Unknown' });
         setTimeout(() => setShowCard(null), 2000);
       }
 

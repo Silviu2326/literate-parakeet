@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { FLAG_MAP } from '../../data/flags';
+import { Header } from '../home/Header';
 import './TacticsMode.css';
 
 interface TacticsModeProps {
   onNavigate: (view: string) => void;
+  points: number;
 }
 
 const TEAMS = Object.entries(FLAG_MAP).map(([name, code]) => ({
@@ -69,7 +71,7 @@ const GAME_QUESTIONS: GameQuestion[] = [
   }
 ];
 
-export const TacticsMode = ({ onNavigate }: TacticsModeProps) => {
+export const TacticsMode = ({ onNavigate, points }: TacticsModeProps) => {
   const [selectedTeam, setSelectedTeam] = useState('España');
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'finished'>('menu');
   const [currentQuestion, setCurrentQuestion] = useState(0);
