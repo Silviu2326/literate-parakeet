@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { Settings, Star } from 'lucide-react';
+import { Header } from '../home/Header';
+import { MobileLayout } from '../../features/fantasy/presentation/shared/MobileLayout';
 import './Party.css';
 
 interface PartyProps {
@@ -47,7 +48,7 @@ export const Party = ({ onNavigate, points }: PartyProps) => {
     if (body) {
       body.style.padding = '0';
       body.style.margin = '0';
-      body.style.overflow = 'hidden';
+      body.style.overflow = 'auto';
     }
 
     return () => {
@@ -133,117 +134,7 @@ export const Party = ({ onNavigate, points }: PartyProps) => {
     return (
       <div className="party-container">
         {/* Header */}
-        <div style={{
-          background: '#1a1d29',
-          padding: 'var(--space-3) var(--space-4)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid var(--border-primary)',
-        }}>
-          {/* Logo a la izquierda */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-2)',
-          }}>
-            <div style={{
-              width: 40,
-              height: 40,
-              background: '#00ff94',
-              borderRadius: 'var(--radius-md)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '20px',
-            }}>
-              🌐
-            </div>
-            <span style={{
-              fontSize: 'var(--text-xl)',
-              fontWeight: 'var(--font-black)',
-              color: '#ffffff',
-            }}>
-              QuinielaMundial
-            </span>
-          </div>
-
-          {/* Controles a la derecha */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-3)',
-          }}>
-            {/* Selector de idioma */}
-            <button
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                background: '#262937',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid #2f3242',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-            >
-              <img
-                src="https://flagcdn.com/w40/es.png"
-                alt="España"
-                style={{
-                  width: 20,
-                  height: 13,
-                  objectFit: 'cover',
-                  borderRadius: '2px',
-                }}
-              />
-              <span style={{
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-bold)',
-                color: '#00ff94',
-              }}>ES</span>
-            </button>
-
-            {/* Puntos */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              background: '#262937',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid #2f3242',
-            }}>
-              <Star size={16} style={{ color: '#00ff94', fill: '#00ff94' }} />
-              <span style={{
-                fontSize: 'var(--text-md)',
-                fontWeight: 'var(--font-black)',
-                color: '#00ff94',
-              }}>
-                {points}
-              </span>
-            </div>
-
-            {/* Settings */}
-            <button
-              style={{
-                width: 40,
-                height: 40,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: '#262937',
-                border: '1px solid #2f3242',
-                borderRadius: 'var(--radius-md)',
-                color: '#ffffff',
-                cursor: 'pointer',
-              }}
-            >
-              <Settings size={20} />
-            </button>
-          </div>
-        </div>
+        <Header points={points} />
 
         <div className="chat-room">
           {/* Header */}
@@ -306,165 +197,67 @@ export const Party = ({ onNavigate, points }: PartyProps) => {
 }
 
   return (
-    <div className="party-container">
-      {/* Header */}
-      <div style={{
-        background: '#1a1d29',
-        padding: 'var(--space-3) var(--space-4)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        borderBottom: '1px solid var(--border-primary)',
-      }}>
-        {/* Logo a la izquierda */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-2)',
-        }}>
-          <div style={{
-            width: 40,
-            height: 40,
-            background: '#00ff94',
-            borderRadius: 'var(--radius-md)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '20px',
-          }}>
-            🌐
-          </div>
-          <span style={{
-            fontSize: 'var(--text-xl)',
-            fontWeight: 'var(--font-black)',
-            color: '#ffffff',
-          }}>
-            QuinielaMundial
-          </span>
+    <MobileLayout onNavigate={onNavigate} currentView="party">
+      <div className="party-container">
+        {/* Banner Image */}
+        <div className="party-banner-container">
+          <img
+            src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1920&q=80"
+            alt="Party Banner"
+            className="party-banner-image"
+          />
+          <div className="party-banner-overlay" />
         </div>
 
-        {/* Controles a la derecha */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-3)',
-        }}>
-          {/* Selector de idioma */}
+        {/* Header */}
+        <Header points={points} />
+
+        <div className="party-content">
+          {/* Back button */}
           <button
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              background: '#262937',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid #2f3242',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
+            onClick={() => onNavigate('dashboard')}
+            className="absolute left-6 top-6 group flex items-center gap-2 text-gray-400 hover:text-[#00E676] transition-all duration-300 z-10"
           >
-            <img
-              src="https://flagcdn.com/w40/es.png"
-              alt="España"
-              style={{
-                width: 20,
-                height: 13,
-                objectFit: 'cover',
-                borderRadius: '2px',
-              }}
-            />
-            <span style={{
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-bold)',
-              color: '#00ff94',
-            }}>ES</span>
+            <div className="w-14 h-14 rounded-full bg-[#141414] border border-[#252525] flex items-center justify-center group-hover:border-[#00E676]/30 group-hover:bg-[#00E676]/5 transition-all">
+              <span className="text-2xl">←</span>
+            </div>
+            <span className="hidden md:block text-xs font-bold tracking-widest uppercase">Volver</span>
           </button>
 
-          {/* Puntos */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '6px 12px',
-            background: '#262937',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid #2f3242',
-          }}>
-            <Star size={16} style={{ color: '#00ff94', fill: '#00ff94' }} />
-            <span style={{
-              fontSize: 'var(--text-md)',
-              fontWeight: 'var(--font-black)',
-              color: '#00ff94',
-            }}>
-              {points}
-            </span>
+          {/* Monitor Icon */}
+          <div className="monitor-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
           </div>
 
-          {/* Settings */}
-          <button
-            style={{
-              width: 40,
-              height: 40,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: '#262937',
-              border: '1px solid #2f3242',
-              borderRadius: 'var(--radius-md)',
-              color: '#ffffff',
-              cursor: 'pointer',
-            }}
-          >
-            <Settings size={20} />
+          {/* Title */}
+          <h1 className="party-title">Watch Party</h1>
+          <p className="party-subtitle">Ve el partido con fans de todo el mundo</p>
+
+          {/* Match Card */}
+          <div className="match-card">
+            <div className="match-info">
+              <span className="flag">🇲🇽</span>
+              <span className="match-teams">México 1-0 Sudáfrica</span>
+              <span className="flag">🇿🇦</span>
+            </div>
+            <div className="viewers-count">34 · {viewers} viendo</div>
+          </div>
+
+          {/* Join Button */}
+          <button onClick={() => setInRoom(true)} className="join-button">
+            UNIRME A LA SALA
+          </button>
+
+          {/* Create Private Room Button */}
+          <button className="private-button">
+            🔒 Crear sala privada
           </button>
         </div>
       </div>
-
-      <div className="party-content">
-        {/* Back button */}
-        <button
-          onClick={() => onNavigate('dashboard')}
-          className="absolute left-6 top-6 group flex items-center gap-2 text-gray-400 hover:text-[#00E676] transition-all duration-300 z-10"
-        >
-          <div className="w-14 h-14 rounded-full bg-[#141414] border border-[#252525] flex items-center justify-center group-hover:border-[#00E676]/30 group-hover:bg-[#00E676]/5 transition-all">
-            <span className="text-2xl">←</span>
-          </div>
-          <span className="hidden md:block text-xs font-bold tracking-widest uppercase">Volver</span>
-        </button>
-
-        {/* Monitor Icon */}
-        <div className="monitor-icon">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-            <line x1="8" y1="21" x2="16" y2="21"></line>
-            <line x1="12" y1="17" x2="12" y2="21"></line>
-          </svg>
-        </div>
-
-        {/* Title */}
-        <h1 className="party-title">Watch Party</h1>
-        <p className="party-subtitle">Ve el partido con fans de todo el mundo</p>
-
-        {/* Match Card */}
-        <div className="match-card">
-          <div className="match-info">
-            <span className="flag">🇲🇽</span>
-            <span className="match-teams">México 1-0 Sudáfrica</span>
-            <span className="flag">🇿🇦</span>
-          </div>
-          <div className="viewers-count">34 · {viewers} viendo</div>
-        </div>
-
-        {/* Join Button */}
-        <button onClick={() => setInRoom(true)} className="join-button">
-          UNIRME A LA SALA
-        </button>
-
-        {/* Create Private Room Button */}
-        <button className="private-button">
-          🔒 Crear sala privada
-        </button>
-      </div>
-    </div>
+    </MobileLayout>
   );
 };

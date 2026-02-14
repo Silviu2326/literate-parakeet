@@ -9,13 +9,10 @@ import {
   Activity,
   BarChart3,
   Users,
-  Home,
-  FileText,
-  Tv,
-  Trophy,
-  MessageSquare
+  Clock
 } from 'lucide-react';
 import { Header } from '../home/Header';
+import { MobileLayout } from '../../features/fantasy/presentation/shared/MobileLayout';
 
 interface MatchCenterProps {
   onNavigate: (view: string) => void;
@@ -28,6 +25,11 @@ const MATCH_DATA = {
   away: { name: 'Sudáfrica', flag: 'za', score: 0, color: '#FFD700', formation: '4-4-2' },
   group: 'Grupo A',
   stadium: 'Estadio Azteca',
+};
+
+// Helper para obtener URL de imagen de bandera
+const getFlagUrl = (countryCode: string, size: number = 80) => {
+  return `https://flagcdn.com/w${size}/${countryCode.toLowerCase()}.png`;
 };
 
 // Eventos del partido (minuto, tipo, equipo, descripción)
@@ -131,6 +133,12 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
   const [showCard, setShowCard] = useState<{ type: 'yellow' | 'red'; player: string } | null>(null);
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const [ballPosition, setBallPosition] = useState({ x: 50, y: 50 });
+  const [playerPositions, setPlayerPositions] = useState(FIELD_POSITIONS);
+  const [goalCelebrationPending, setGoalCelebrationPending] = useState<{home: number, away: number} | null>(null);
+  const [possession, setPossession] = useState<'home' | 'away'>('home');
+  const [playerWithBall, setPlayerWithBall] = useState<number | null>(null);
+  const [ballTrail, setBallTrail] = useState<Array<{x: number, y: number}>>([]);
+  const [passStart, setPassStart] = useState<{x: number, y: number} | null>(null);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -178,20 +186,39 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
       if (lastNewEvent.type === 'goal') {
         const [home, away] = lastNewEvent.score?.split('-').map(Number) || [0, 0];
         setScore({ home, away });
-        setShowCelebration(true);
-
-        // Crear partículas de celebración
-        const newParticles = Array.from({ length: 20 }, (_, i) => ({
-          id: Date.now() + i,
-          x: 50 + (Math.random() - 0.5) * 30,
-          y: 50 + (Math.random() - 0.5) * 30,
-        }));
-        setParticles(newParticles);
-
+        
+        // Determinar qué equipo metió gol
+        const isHomeGoal = lastNewEvent.team === 'home';
+        const goalX = isHomeGoal ? 95 : 5;
+        const goalY = 40 + Math.random() * 20; // Variación en altura del gol
+        
+        // Actualizar posesión y llevar balón al área para el disparo
+        setPossession(lastNewEvent.team);
+        
+        // Posicionar al jugador goleador cerca del área
+        setPlayerPositions(prev => {
+          const newPositions = { ...prev };
+          const shooterNum = lastNewEvent.player === 'Santi' ? 11 : 
+                            lastNewEvent.player === 'Lozano' ? 22 :
+                            lastNewEvent.player === 'Nurkovic' ? 9 :
+                            lastNewEvent.player === 'Quiñones' ? 10 : null;
+          
+          if (shooterNum) {
+            newPositions[lastNewEvent.team] = prev[lastNewEvent.team].map(p => 
+              p.num === shooterNum 
+                ? { ...p, x: isHomeGoal ? 85 : 15, y: goalY }
+                : p
+            );
+            setPlayerWithBall(shooterNum);
+          }
+          return newPositions;
+        });
+        
+        // Pequeña pausa y luego disparo a portería
         setTimeout(() => {
-          setShowCelebration(false);
-          setParticles([]);
-        }, 3000);
+          setBallPosition({ x: goalX, y: goalY });
+          setGoalCelebrationPending({ home, away });
+        }, 500);
       }
 
       // Mostrar tarjetas con animación
@@ -200,8 +227,8 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
         setTimeout(() => setShowCard(null), 2000);
       }
 
-      // Mover balón a posición aleatoria en eventos importantes
-      if (lastNewEvent.type === 'goal' || lastNewEvent.type === 'red') {
+      // Mover balón en eventos de tarjeta roja
+      if (lastNewEvent.type === 'red') {
         setBallPosition({
           x: 30 + Math.random() * 40,
           y: 30 + Math.random() * 40,
@@ -216,6 +243,15 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
       setCurrentMinute(0);
       setScore({ home: 0, away: 0 });
       setVisibleEvents([]);
+      setPlayerPositions(FIELD_POSITIONS);
+      setBallPosition({ x: 50, y: 50 });
+      setGoalCelebrationPending(null);
+      setShowCelebration(false);
+      setParticles([]);
+      setPossession('home');
+      setPlayerWithBall(null);
+      setBallTrail([]);
+      setPassStart(null);
       setIsPlaying(true);
     } else {
       setIsPlaying(!isPlaying);
@@ -228,100 +264,230 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
     } else {
       setCurrentMinute(prev => Math.min(90, prev + 10));
     }
+    // Limpiar trayectoria al saltar
+    setBallTrail([]);
+    setPassStart(null);
   }, []);
 
-  // Animar balón mientras juega
+  // Detectar cuando el balón llega a la portería para mostrar celebración
+  useEffect(() => {
+    if (goalCelebrationPending && (ballPosition.x >= 90 || ballPosition.x <= 10)) {
+      // El balón llegó a la portería, mostrar celebración
+      setShowCelebration(true);
+      
+      // Crear partículas de celebración
+      const newParticles = Array.from({ length: 25 }, (_, i) => ({
+        id: Date.now() + i,
+        x: ballPosition.x > 50 ? 90 : 10,
+        y: 50 + (Math.random() - 0.5) * 30,
+      }));
+      setParticles(newParticles);
+
+      // Ocultar celebración después de 3 segundos y resetear posiciones
+      setTimeout(() => {
+        setShowCelebration(false);
+        setParticles([]);
+        setGoalCelebrationPending(null);
+        // Resetear posición del balón al centro
+        setBallPosition({ x: 50, y: 50 });
+        // Resetear posiciones de jugadores a iniciales
+        setPlayerPositions(FIELD_POSITIONS);
+        // Cambiar posesión al equipo que recibe el saque
+        setPossession(prev => prev === 'home' ? 'away' : 'home');
+        setPlayerWithBall(null);
+        // Limpiar trayectoria
+        setBallTrail([]);
+        setPassStart(null);
+      }, 3000);
+    }
+  }, [ballPosition, goalCelebrationPending]);
+
+  // Simulación realista de juego con pases y progresión mejorada
   useEffect(() => {
     if (isPlaying) {
-      const ballInterval = setInterval(() => {
-        setBallPosition(prev => ({
-          x: Math.max(10, Math.min(90, prev.x + (Math.random() - 0.5) * 8)),
-          y: Math.max(10, Math.min(90, prev.y + (Math.random() - 0.5) * 8)),
-        }));
-      }, 1000);
-      return () => clearInterval(ballInterval);
+      const gameInterval = setInterval(() => {
+        setPlayerPositions(prev => {
+          const newPositions = { ...prev };
+          const attackingTeam = possession;
+          const defendingTeam = possession === 'home' ? 'away' : 'home';
+          const isHomeAttacking = attackingTeam === 'home';
+          
+          // Dirección del ataque (hacia la portería rival)
+          const attackDirection = isHomeAttacking ? 1 : -1;
+          const goalX = isHomeAttacking ? 95 : 5;
+          
+          // Encontrar jugador con balón o asignarlo
+          let currentHolder = playerWithBall;
+          if (!currentHolder) {
+            // Buscar mediocampista o delantero para iniciar jugada
+            const starters = prev[attackingTeam].filter(p => {
+              const original = FIELD_POSITIONS[attackingTeam].find(fp => fp.num === p.num);
+              return original && original.x > 35 && original.x < 70;
+            });
+            currentHolder = starters[Math.floor(Math.random() * starters.length)]?.num || prev[attackingTeam][0].num;
+            setPlayerWithBall(currentHolder);
+          }
+          
+          // Posición del jugador con balón
+          const holderPos = prev[attackingTeam].find(p => p.num === currentHolder);
+          if (holderPos) {
+            // Mover balón suavemente hacia el jugador
+            setBallPosition(prevBall => {
+              const distToTarget = Math.sqrt(
+                Math.pow(holderPos.x - prevBall.x, 2) + 
+                Math.pow(holderPos.y - prevBall.y, 2)
+              );
+              // Si el balón llegó al destino, limpiar la línea de pase
+              if (distToTarget < 3 && passStart) {
+                setPassStart(null);
+              }
+              const newPos = {
+                x: prevBall.x + (holderPos.x - prevBall.x) * 0.12,
+                y: prevBall.y + (holderPos.y - prevBall.y) * 0.12
+              };
+              // Guardar trayectoria (últimas 8 posiciones)
+              setBallTrail(prev => [...prev.slice(-7), newPos]);
+              return newPos;
+            });
+            
+            // Decidir acción: pase o avance
+            const distToGoal = Math.abs(holderPos.x - goalX);
+            const distAdvanced = isHomeAttacking ? holderPos.x : 100 - holderPos.x;
+            
+            // Probabilidad de pase aumenta con la distancia al gol
+            const passProbability = Math.min(0.7, 0.2 + distToGoal / 100);
+            
+            if (distToGoal > 20 && Math.random() < passProbability) {
+              // Buscar compañero en buena posición
+              const teammates = prev[attackingTeam].filter(p => p.num !== currentHolder);
+              
+              // Evaluar mejores opciones de pase
+              const passOptions = teammates.map(t => {
+                const isMoreAdvanced = isHomeAttacking ? t.x > holderPos.x : t.x < holderPos.x;
+                const distFromHolder = Math.sqrt(
+                  Math.pow(t.x - holderPos.x, 2) + Math.pow(t.y - holderPos.y, 2)
+                );
+                // Puntuación: más alta = mejor opción
+                const advanceScore = isHomeAttacking ? t.x : 100 - t.x;
+                const spacingScore = Math.max(0, 20 - Math.abs(distFromHolder - 15)) / 20;
+                return { ...t, score: advanceScore * 0.6 + spacingScore * 40, dist: distFromHolder };
+              }).filter(t => t.dist > 8 && t.dist < 30 && t.score > 20);
+              
+              if (passOptions.length > 0) {
+                // Elegir mejor opción
+                const target = passOptions.sort((a, b) => b.score - a.score)[0];
+                // Guardar inicio del pase para la trayectoria
+                setPassStart({ x: holderPos.x, y: holderPos.y });
+                setPlayerWithBall(target.num);
+              }
+            }
+          }
+          
+          // Mover jugadores de ambos equipos de forma más realista
+          (['home', 'away'] as const).forEach(team => {
+            const isAttacking = team === attackingTeam;
+            
+            newPositions[team] = prev[team].map(player => {
+              const originalPos = FIELD_POSITIONS[team].find(p => p.num === player.num);
+              if (!originalPos) return player;
+              
+              const isBallHolder = player.num === playerWithBall;
+              const distToOriginal = Math.sqrt(
+                Math.pow(player.x - originalPos.x, 2) + 
+                Math.pow(player.y - originalPos.y, 2)
+              );
+              
+              // Límites según posición original
+              const maxRangeX = originalPos.pos === 'POR' ? 15 : 
+                               originalPos.pos === 'DEF' ? 20 : 
+                               originalPos.pos === 'MED' ? 30 : 40;
+              const minX = originalPos.x - maxRangeX;
+              const maxX = originalPos.x + maxRangeX;
+              
+              if (isAttacking) {
+                if (isBallHolder) {
+                  // El portador avanza hacia portería pero con control
+                  const targetX = Math.min(maxX, player.x + attackDirection * 2);
+                  return {
+                    ...player,
+                    x: Math.max(minX, targetX),
+                    y: Math.max(15, Math.min(85, player.y + (Math.random() - 0.5) * 1.5)),
+                  };
+                } else {
+                  // Compañeros ofrecen opciones de pase
+                  const distToBall = Math.sqrt(
+                    Math.pow(player.x - ballPosition.x, 2) + 
+                    Math.pow(player.y - ballPosition.y, 2)
+                  );
+                  
+                  // Si está muy lejos del balón, avanza un poco
+                  if (distToBall > 25) {
+                    const targetX = originalPos.x + attackDirection * 5;
+                    return {
+                      ...player,
+                      x: player.x + (targetX - player.x) * 0.08,
+                      y: player.y + (originalPos.y - player.y) * 0.05,
+                    };
+                  }
+                  
+                  // Volver a posición relativa si se alejó mucho
+                  if (distToOriginal > 15) {
+                    return {
+                      ...player,
+                      x: player.x + (originalPos.x - player.x) * 0.03,
+                      y: player.y + (originalPos.y - player.y) * 0.03,
+                    };
+                  }
+                }
+              } else {
+                // Equipo defendiendo
+                const distToBall = Math.sqrt(
+                  Math.pow(player.x - ballPosition.x, 2) + 
+                  Math.pow(player.y - ballPosition.y, 2)
+                );
+                const isDefender = originalPos.pos === 'DEF' || originalPos.pos === 'POR';
+                
+                if (distToBall < 20) {
+                  // Presionar al portador
+                  const pressIntensity = isDefender ? 0.15 : 0.08;
+                  return {
+                    ...player,
+                    x: Math.max(minX, Math.min(maxX, player.x + (ballPosition.x - player.x) * pressIntensity)),
+                    y: Math.max(15, Math.min(85, player.y + (ballPosition.y - player.y) * pressIntensity)),
+                  };
+                } else if (distToOriginal > 10) {
+                  // Recuperar posición defensiva
+                  return {
+                    ...player,
+                    x: player.x + (originalPos.x - player.x) * 0.04,
+                    y: player.y + (originalPos.y - player.y) * 0.04,
+                  };
+                }
+              }
+              
+              // Pequeña inercia de movimiento
+              return {
+                ...player,
+                x: Math.max(minX, Math.min(maxX, player.x + (Math.random() - 0.5) * 0.3)),
+                y: Math.max(15, Math.min(85, player.y + (Math.random() - 0.5) * 0.3)),
+              };
+            });
+          });
+          
+          return newPositions;
+        });
+      }, 1200);
+      return () => clearInterval(gameInterval);
     }
-  }, [isPlaying]);
+  }, [isPlaying, possession, playerWithBall, ballPosition]);
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'var(--bg-primary)',
-      paddingBottom: 90,
-    }}>
+    <MobileLayout onNavigate={onNavigate} currentView="match">
       {/* Header Principal */}
       <Header points={points} />
 
       {/* HEADER */}
-      <div style={{
-        background: 'var(--bg-secondary)',
-        padding: 'var(--space-3) var(--space-4)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderBottom: '1px solid var(--border-primary)',
-        position: 'relative',
-      }}>
-        <button 
-          onClick={() => onNavigate('dashboard')}
-          style={{
-            position: 'absolute',
-            left: 'var(--space-4)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-1)',
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
-            fontSize: 'var(--text-sm)',
-          }}
-        >
-          <ChevronLeft size={18} />
-          Inicio
-        </button>
-
-        <span style={{
-          fontSize: 'var(--text-lg)',
-          fontWeight: 'var(--font-black)',
-          color: 'var(--text-primary)',
-        }}>
-          QuinielaMundial
-        </span>
-        
-        <div style={{
-          position: 'absolute',
-          right: 'var(--space-4)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-2)',
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            padding: '4px 8px',
-            background: 'var(--bg-tertiary)',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--border-primary)',
-          }}>
-            <span style={{ fontSize: '14px' }}>🇪🇸</span>
-            <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>ES</span>
-          </div>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            padding: '4px 10px',
-            background: 'var(--bg-tertiary)',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--border-primary)',
-          }}>
-            <Zap size={14} style={{ color: 'var(--color-primary)' }} />
-            <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-black)', color: 'var(--color-primary)' }}>1847</span>
-          </div>
-        </div>
-      </div>
+      
 
       {/* EN VIVO */}
       <div style={{
@@ -361,79 +527,122 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 'var(--space-4)',
+          gap: '12px',
           marginBottom: 'var(--space-2)',
+          flexWrap: 'nowrap',
         }}>
           {/* Local */}
           <div style={{
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: 'var(--space-2)',
+            gap: '8px',
             transition: 'all 0.3s ease',
+            flexShrink: 0,
           }}>
+            <img 
+              src={getFlagUrl(MATCH_DATA.home.flag, 80)} 
+              alt={MATCH_DATA.home.name} 
+              style={{ 
+                width: 48, 
+                height: 32, 
+                borderRadius: 6, 
+                objectFit: 'cover',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                animation: isPlaying ? 'pulse 2s ease-in-out infinite' : 'none',
+              }} 
+            />
             <span style={{
-              fontSize: '40px',
-              filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',
-              animation: isPlaying ? 'pulse 2s ease-in-out infinite' : 'none',
-            }}>🇲🇽</span>
-            <span style={{
-              fontSize: 'var(--text-lg)',
+              fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-black)',
               color: 'var(--text-primary)',
               textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              whiteSpace: 'nowrap',
             }}>{MATCH_DATA.home.name}</span>
           </div>
 
-          {/* Score */}
+          {/* Score con tiempo arriba */}
           <div style={{
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: 'var(--space-3)',
-            background: 'var(--bg-secondary)',
-            padding: 'var(--space-3) var(--space-4)',
-            borderRadius: 'var(--radius-xl)',
-            border: '2px solid var(--border-primary)',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.1)',
+            gap: '4px',
+            flexShrink: 0,
           }}>
+            {/* Tiempo */}
             <span style={{
-              fontSize: 'var(--text-4xl)',
+              color: 'white',
+              background: 'linear-gradient(135deg, #00c853 0%, #00a854 100%)',
+              padding: '4px 12px',
+              borderRadius: 8,
               fontWeight: 'var(--font-black)',
-              color: 'var(--color-primary)',
-              transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-              textShadow: '0 2px 8px rgba(0,200,83,0.3)',
-            }} key={`home-${score.home}`} className="score-number">{score.home}</span>
-            <span style={{
-              fontSize: 'var(--text-2xl)',
-              color: 'var(--text-tertiary)',
-              fontWeight: 'var(--font-light)',
-            }}>—</span>
-            <span style={{
-              fontSize: 'var(--text-4xl)',
-              fontWeight: 'var(--font-black)',
-              color: 'var(--color-warning)',
-              transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-              textShadow: '0 2px 8px rgba(251,191,36,0.3)',
-            }} key={`away-${score.away}`} className="score-number">{score.away}</span>
+              boxShadow: '0 2px 8px rgba(0,200,83,0.4)',
+              fontSize: '14px',
+              whiteSpace: 'nowrap',
+            }}>
+              {Math.floor(currentMinute)}'
+            </span>
+            {/* Marcador */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'var(--bg-secondary)',
+              padding: '8px 16px',
+              borderRadius: 12,
+              border: '2px solid var(--border-primary)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.1)',
+            }}>
+              <span style={{
+                fontSize: 'var(--text-4xl)',
+                fontWeight: 'var(--font-black)',
+                color: 'var(--color-primary)',
+                transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                textShadow: '0 2px 8px rgba(0,200,83,0.3)',
+              }} key={`home-${score.home}`} className="score-number">{score.home}</span>
+              <span style={{
+                fontSize: 'var(--text-2xl)',
+                color: 'var(--text-tertiary)',
+                fontWeight: 'var(--font-light)',
+              }}>—</span>
+              <span style={{
+                fontSize: 'var(--text-4xl)',
+                fontWeight: 'var(--font-black)',
+                color: 'var(--color-warning)',
+                transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                textShadow: '0 2px 8px rgba(251,191,36,0.3)',
+              }} key={`away-${score.away}`} className="score-number">{score.away}</span>
+            </div>
           </div>
 
           {/* Visitante */}
           <div style={{
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: 'var(--space-2)',
+            gap: '8px',
             transition: 'all 0.3s ease',
+            flexShrink: 0,
           }}>
+            <img 
+              src={getFlagUrl(MATCH_DATA.away.flag, 80)} 
+              alt={MATCH_DATA.away.name} 
+              style={{ 
+                width: 48, 
+                height: 32, 
+                borderRadius: 6, 
+                objectFit: 'cover',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                animation: isPlaying ? 'pulse 2s ease-in-out infinite' : 'none',
+              }} 
+            />
             <span style={{
-              fontSize: 'var(--text-lg)',
+              fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-black)',
               color: 'var(--text-primary)',
               textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              whiteSpace: 'nowrap',
             }}>{MATCH_DATA.away.name}</span>
-            <span style={{
-              fontSize: '40px',
-              filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',
-              animation: isPlaying ? 'pulse 2s ease-in-out infinite' : 'none',
-            }}>🇿🇦</span>
           </div>
         </div>
         <div style={{
@@ -539,24 +748,70 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
           }} />
 
           {/* Jugadores */}
-          {FIELD_POSITIONS.home.map(player => (
-            <PlayerDot key={`home-${player.num}`} player={player} color={MATCH_DATA.home.color} isPlaying={isPlaying} />
+          {playerPositions.home.map(player => (
+            <PlayerDot 
+              key={`home-${player.num}`} 
+              player={player} 
+              color={MATCH_DATA.home.color} 
+              isPlaying={isPlaying} 
+              hasBall={possession === 'home' && playerWithBall === player.num}
+            />
           ))}
-          {FIELD_POSITIONS.away.map(player => (
-            <PlayerDot key={`away-${player.num}`} player={player} color={MATCH_DATA.away.color} isPlaying={isPlaying} />
+          {playerPositions.away.map(player => (
+            <PlayerDot 
+              key={`away-${player.num}`} 
+              player={player} 
+              color={MATCH_DATA.away.color} 
+              isPlaying={isPlaying}
+              hasBall={possession === 'away' && playerWithBall === player.num}
+            />
           ))}
+
+          {/* Trayectoria del balón */}
+          <svg style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none',
+            zIndex: 9,
+          }}>
+            {/* Línea de pase activo */}
+            {passStart && playerWithBall && (
+              <line
+                x1={`${passStart.x}%`}
+                y1={`${passStart.y}%`}
+                x2={`${ballPosition.x}%`}
+                y2={`${ballPosition.y}%`}
+                stroke="rgba(255,255,255,0.6)"
+                strokeWidth="2"
+                strokeDasharray="4,4"
+              />
+            )}
+            {/* Trail del balón */}
+            {ballTrail.length > 1 && (
+              <polyline
+                points={ballTrail.map(p => `${p.x}%,${p.y}%`).join(' ')}
+                fill="none"
+                stroke="rgba(255,255,255,0.3)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            )}
+          </svg>
 
           {/* Balón mejorado */}
           <div style={{
             position: 'absolute',
             left: `${ballPosition.x}%`,
             top: `${ballPosition.y}%`,
-            width: 16,
-            height: 16,
+            width: 12,
+            height: 12,
             transform: 'translate(-50%, -50%)',
             zIndex: 10,
             transition: 'all 1s cubic-bezier(0.4, 0, 0.2, 1)',
-            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))',
+            filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.4))',
             animation: isPlaying ? 'ballBounce 0.5s ease-in-out infinite' : 'none',
           }}>
             <div style={{
@@ -567,52 +822,42 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '12px',
+              fontSize: '10px',
             }}>⚽</div>
           </div>
 
-          {/* Marcador en campo */}
-          <div style={{
-            position: 'absolute',
-            top: 12,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: 'linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(20,20,20,0.9) 100%)',
-            padding: '8px 20px',
-            borderRadius: 'var(--radius-xl)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            fontSize: '14px',
-            fontWeight: 'var(--font-bold)',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1)',
-            backdropFilter: 'blur(8px)',
-          }}>
-            <span style={{ fontSize: '18px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}>🇲🇽</span>
-            <span style={{
-              color: 'white',
-              fontSize: '16px',
-              fontWeight: 'var(--font-black)',
-              textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-            }}>{score.home} - {score.away}</span>
-            <span style={{ fontSize: '18px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}>🇿🇦</span>
-            <span style={{
-              color: 'white',
-              background: 'linear-gradient(135deg, var(--color-primary) 0%, #00a854 100%)',
-              padding: '4px 10px',
-              borderRadius: 'var(--radius-md)',
-              fontWeight: 'var(--font-black)',
-              boxShadow: '0 2px 8px rgba(0,200,83,0.4)',
-            }}>
-              {Math.floor(currentMinute)}'
-            </span>
-          </div>
+          {/* Marcador en campo - Eliminado, ahora está en el score principal */}
         </div>
       </div>
 
       {/* CONTROLES */}
       <div style={{ padding: '0 var(--space-4)', marginBottom: 'var(--space-4)' }}>
-        {/* Botones */}
+        {/* Botones de velocidad - Solo visibles cuando está reproduciendo */}
+        {isPlaying && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 'var(--space-2)',
+            marginBottom: 'var(--space-3)',
+            animation: 'fadeInDown 0.3s ease',
+          }}>
+            {[1, 2, 4].map(s => (
+              <button key={s} onClick={() => setSpeed(s)} className="speed-btn" style={{
+                padding: '6px 16px',
+                background: speed === s ? 'linear-gradient(135deg, var(--color-primary) 0%, #00a854 100%)' : 'var(--bg-tertiary)',
+                border: speed === s ? 'none' : '1px solid var(--border-primary)',
+                borderRadius: 'var(--radius-md)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)',
+                color: speed === s ? 'white' : 'var(--text-secondary)', cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: speed === s ? '0 2px 8px rgba(0,200,83,0.3)' : 'none',
+                minWidth: 44,
+              }}>{s}x</button>
+            ))}
+          </div>
+        )}
+
+        {/* Botones principales */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -642,18 +887,6 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
             borderRadius: 'var(--radius-lg)', color: 'var(--text-secondary)', cursor: 'pointer',
             transition: 'all 0.2s ease',
           }}><SkipForward size={18} /></button>
-
-          {[1, 2, 4].map(s => (
-            <button key={s} onClick={() => setSpeed(s)} className="speed-btn" style={{
-              padding: 'var(--space-1) var(--space-3)',
-              background: speed === s ? 'linear-gradient(135deg, var(--color-primary) 0%, #00a854 100%)' : 'var(--bg-tertiary)',
-              border: speed === s ? 'none' : '1px solid var(--border-primary)',
-              borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-bold)',
-              color: speed === s ? 'white' : 'var(--text-secondary)', cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              boxShadow: speed === s ? '0 2px 8px rgba(0,200,83,0.3)' : 'none',
-            }}>{s}x</button>
-          ))}
         </div>
 
         {/* Timeline */}
@@ -665,8 +898,8 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
           marginBottom: 'var(--space-4)',
           boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)',
         }}>
-          {/* Marcadores de eventos */}
-          {MATCH_EVENTS.map((event, i) => (
+          {/* Marcadores de eventos - Solo visibles cuando ocurren */}
+          {MATCH_EVENTS.filter(event => currentMinute >= event.minute).map((event, i) => (
             <div
               key={i}
               className="timeline-event"
@@ -679,7 +912,7 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
                 zIndex: 5,
                 transition: 'all 0.2s ease',
                 cursor: 'pointer',
-                filter: currentMinute >= event.minute ? 'grayscale(0)' : 'grayscale(1) opacity(0.3)',
+                animation: 'fadeInScale 0.3s ease',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateX(-50%) scale(1.4)';
@@ -687,7 +920,7 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateX(-50%) scale(1)';
-                e.currentTarget.style.filter = currentMinute >= event.minute ? 'grayscale(0)' : 'grayscale(1) opacity(0.3)';
+                e.currentTarget.style.filter = 'none';
               }}
             >
               {event.type === 'goal' ? '⚽' : event.type === 'yellow' ? '🟨' : event.type === 'red' ? '🟥' : '🔄'}
@@ -734,19 +967,6 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
         {activeTab === 'lineups' && <LineupsTab />}
       </div>
 
-      {/* NAVEGACIÓN INFERIOR */}
-      <nav style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, height: 70,
-        background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-primary)',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-around', zIndex: 100,
-      }}>
-        <BottomNavItem icon={<Home size={22} />} label="Inicio" onClick={() => onNavigate('dashboard')} />
-        <BottomNavItem icon={<FileText size={22} />} label="Mis Apuestas" onClick={() => onNavigate('bets')} />
-        <BottomNavItem icon={<Tv size={22} />} label="Match" isActive onClick={() => {}} />
-        <BottomNavItem icon={<Trophy size={22} />} label="Ranking" onClick={() => onNavigate('ranking')} />
-        <BottomNavItem icon={<MessageSquare size={22} />} label="IA" onClick={() => onNavigate('ai')} />
-      </nav>
-
       <style>{`
         @keyframes pulse {
           0%, 100% { opacity: 1; }
@@ -755,6 +975,14 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
         @keyframes fadeIn {
           from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
           to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        @keyframes fadeInDown {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInScale {
+          from { opacity: 0; transform: scale(0); }
+          to { opacity: 1; transform: scale(1); }
         }
         @keyframes slideIn {
           from { opacity: 0; transform: translateX(-20px); }
@@ -830,7 +1058,7 @@ export const MatchCenter = ({ onNavigate, points }: MatchCenterProps) => {
           transform: translateY(0);
         }
       `}</style>
-    </div>
+    </MobileLayout>
   );
 };
 
@@ -924,7 +1152,7 @@ function FieldLines() {
   );
 }
 
-function PlayerDot({ player, color, isPlaying }: { player: { num: number; name: string; x: number; y: number }; color: string; isPlaying: boolean }) {
+function PlayerDot({ player, color, isPlaying, hasBall }: { player: { num: number; name: string; x: number; y: number }; color: string; isPlaying: boolean; hasBall?: boolean }) {
   return (
     <div style={{
       position: 'absolute',
@@ -934,31 +1162,50 @@ function PlayerDot({ player, color, isPlaying }: { player: { num: number; name: 
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      gap: '2px',
-      animation: isPlaying ? 'playerPulse 2s ease-in-out infinite' : 'none',
-      transition: 'all 0.3s ease',
+      gap: '1px',
+      animation: hasBall ? 'playerPulse 1s ease-in-out infinite' : isPlaying ? 'playerPulse 2s ease-in-out infinite' : 'none',
+      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+      zIndex: hasBall ? 15 : 5,
     }}>
       <div style={{
-        width: 26, height: 26, background: `linear-gradient(135deg, ${color} 0%, ${color}dd 100%)`,
+        width: hasBall ? 18 : 14, 
+        height: hasBall ? 18 : 14, 
+        background: `linear-gradient(135deg, ${color} 0%, ${color}dd 100%)`,
         borderRadius: '50%',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '11px', fontWeight: 'var(--font-black)', color: 'white',
+        fontSize: '7px', fontWeight: 'var(--font-black)', color: 'white',
         textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-        boxShadow: `0 4px 8px rgba(0,0,0,0.3), 0 0 0 2px rgba(255,255,255,0.2), 0 0 20px ${color}40`,
-        border: '2px solid rgba(255,255,255,0.5)',
+        boxShadow: hasBall 
+          ? `0 0 0 2px white, 0 0 0 4px ${color}, 0 4px 12px rgba(0,0,0,0.4), 0 0 20px ${color}80`
+          : `0 3px 6px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.3)`,
+        border: hasBall ? '2px solid white' : '1px solid rgba(255,255,255,0.5)',
         transition: 'all 0.3s ease',
       }}>{player.num}</div>
       <span style={{
-        fontSize: '9px',
+        fontSize: '7px',
         fontWeight: 'var(--font-bold)',
         color: 'white',
         textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.5)',
         whiteSpace: 'nowrap',
         background: 'rgba(0,0,0,0.6)',
-        padding: '2px 6px',
-        borderRadius: '4px',
+        padding: '1px 3px',
+        borderRadius: '2px',
         backdropFilter: 'blur(4px)',
+        opacity: hasBall ? 1 : 0.85,
       }}>{player.name}</span>
+      {hasBall && (
+        <div style={{
+          position: 'absolute',
+          width: 6,
+          height: 6,
+          background: 'white',
+          borderRadius: '50%',
+          top: -3,
+          right: -3,
+          boxShadow: '0 0 8px rgba(255,255,255,0.8)',
+          animation: 'pulse 0.5s infinite',
+        }} />
+      )}
     </div>
   );
 }
@@ -1001,7 +1248,17 @@ function EventsTab({ events, currentMinute: _currentMinute, isPlaying }: { event
   if (events.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--text-tertiary)' }}>
-        <div style={{ fontSize: '40px', marginBottom: 'var(--space-4)' }}>{isPlaying ? '⏳' : '▶️'}</div>
+        <div style={{ 
+          marginBottom: 'var(--space-4)', 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center' 
+        }}>
+          {isPlaying ? 
+            <Clock size={40} style={{ color: 'var(--color-primary)' }} /> : 
+            <Play size={40} style={{ color: 'var(--color-primary)', fill: 'var(--color-primary)' }} />
+          }
+        </div>
         <p>{isPlaying ? 'Esperando eventos...' : 'Pulsa play para iniciar el partido'}</p>
       </div>
     );
@@ -1074,7 +1331,10 @@ function EventsTab({ events, currentMinute: _currentMinute, isPlaying }: { event
             )}
           </div>
           <div style={{ fontSize: '32px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>
-            {event.team === 'home' ? '🇲🇽' : '🇿🇦'}
+            {event.team === 'home' ? 
+              <img src={getFlagUrl(MATCH_DATA.home.flag, 40)} alt={MATCH_DATA.home.name} style={{ width: 28, height: 20, borderRadius: 4, objectFit: 'cover', display: 'block' }} /> : 
+              <img src={getFlagUrl(MATCH_DATA.away.flag, 40)} alt={MATCH_DATA.away.name} style={{ width: 28, height: 20, borderRadius: 4, objectFit: 'cover', display: 'block' }} />
+            }
           </div>
         </div>
       )).reverse()}
@@ -1138,7 +1398,10 @@ function StatRow({ label, home, away, isPercent, max, index = 0 }: { label: stri
           background: 'rgba(0,200,83,0.1)',
           padding: '2px 8px',
           borderRadius: 'var(--radius-sm)',
-        }}>{homeDisplay}</span>
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+        }}><img src={getFlagUrl(MATCH_DATA.home.flag, 40)} alt={MATCH_DATA.home.name} style={{ width: 20, height: 14, borderRadius: 3, objectFit: 'cover', display: 'inline-block', verticalAlign: 'middle' }} /> {homeDisplay}</span>
         <span style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-secondary)' }}>{label}</span>
         <span style={{
           fontWeight: 'var(--font-black)',
@@ -1147,7 +1410,10 @@ function StatRow({ label, home, away, isPercent, max, index = 0 }: { label: stri
           background: 'rgba(251,191,36,0.1)',
           padding: '2px 8px',
           borderRadius: 'var(--radius-sm)',
-        }}>{awayDisplay}</span>
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+        }}>{awayDisplay} <img src={getFlagUrl(MATCH_DATA.away.flag, 40)} alt={MATCH_DATA.away.name} style={{ width: 20, height: 14, borderRadius: 3, objectFit: 'cover', display: 'inline-block', verticalAlign: 'middle' }} /></span>
       </div>
       <div style={{
         height: 8,
@@ -1192,7 +1458,7 @@ function LineupsTab() {
         boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)', paddingBottom: 'var(--space-3)', borderBottom: '1px solid var(--border-primary)' }}>
-          <span style={{ fontSize: '24px' }}>🇲🇽</span>
+          <img src={getFlagUrl(MATCH_DATA.home.flag, 80)} alt={MATCH_DATA.home.name} style={{ width: 40, height: 28, borderRadius: 4, objectFit: 'cover', display: 'block', boxShadow: '0 4px 8px rgba(0,0,0,0.2)' }} />
           <div>
             <div style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>{MATCH_DATA.home.name}</div>
             <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>{LINEUPS.home.formation} · DT: {LINEUPS.home.coach}</div>
@@ -1229,7 +1495,7 @@ function LineupsTab() {
         boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)', paddingBottom: 'var(--space-3)', borderBottom: '1px solid var(--border-primary)' }}>
-          <span style={{ fontSize: '24px' }}>🇿🇦</span>
+          <img src={getFlagUrl(MATCH_DATA.away.flag, 80)} alt={MATCH_DATA.away.name} style={{ width: 40, height: 28, borderRadius: 4, objectFit: 'cover', display: 'block', boxShadow: '0 4px 8px rgba(0,0,0,0.2)' }} />
           <div>
             <div style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>{MATCH_DATA.away.name}</div>
             <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>{LINEUPS.away.formation} · DT: {LINEUPS.away.coach}</div>
@@ -1259,15 +1525,4 @@ function LineupsTab() {
   );
 }
 
-function BottomNavItem({ icon, label, isActive = false, onClick }: { icon: React.ReactNode; label: string; isActive?: boolean; onClick: () => void }) {
-  return (
-    <button onClick={onClick} style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
-      background: 'transparent', border: 'none', padding: 'var(--space-2)', cursor: 'pointer',
-      color: isActive ? 'var(--color-primary)' : 'var(--text-tertiary)',
-    }}>
-      {icon}
-      <span style={{ fontSize: '10px', fontWeight: isActive ? 'var(--font-bold)' : 'var(--font-medium)' }}>{label}</span>
-    </button>
-  );
-}
+

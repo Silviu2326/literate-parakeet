@@ -1,255 +1,239 @@
-.micro-container {
-  min-height: 100vh;
-  background-color: #0D0D0D;
-}
+/* Micro-Predicciones Component Styles */
 
-.micro-header {
-  background-color: #141414;
-  border-bottom: 1px solid #252525;
-  padding: 1rem;
-}
-
-.micro-back-button {
-  margin-bottom: 0.75rem;
-  color: #9CA3AF;
-  font-weight: bold;
-  font-size: 0.875rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: color 0.3s;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.micro-back-button:hover {
-  color: #00E676;
-}
-
-.micro-title-wrapper {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.micro-icon {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 1rem;
-  border: 4px solid #00E676;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  animation: pulse 2s infinite;
-}
-
-.micro-icon::before,
-.micro-icon::after {
-  content: '';
+/* Banner Styles (reutilizando de Stories) */
+.stories-banner-container {
   position: absolute;
-  width: 12px;
-  height: 12px;
-  background-color: #00E676;
-  border-radius: 50%;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
 }
 
-.micro-icon::before {
-  top: 50%;
-  left: 8px;
-  transform: translateY(-50%);
+.stories-banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
-.micro-icon::after {
-  top: 50%;
-  right: 8px;
-  transform: translateY(-50%);
+.stories-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 13, 13, 0.6) 0%,
+    rgba(13, 13, 13, 0.7) 50%,
+    rgba(13, 13, 13, 0.9) 100%
+  );
+  z-index: 1;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(0, 230, 118, 0);
-  }
+/* Hero Section */
+.stories-hero-content {
+  padding-top: 60px !important;
+  padding-bottom: 40px !important;
+  margin-left: 16px;
+  margin-right: 16px;
 }
 
-.micro-title {
-  color: white;
-  font-weight: 900;
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+.stories-hero-icon {
+  margin-bottom: 32px;
 }
 
-.micro-content {
-  max-width: 56rem;
-  margin: 0 auto;
-  padding: 1rem;
+.stories-hero-title-section {
+  padding-left: 24px;
+  padding-right: 24px;
+  margin-bottom: 16px;
 }
 
-.micro-match-selector {
-  margin-bottom: 1rem;
+.stories-hero-title {
+  margin-bottom: 20px;
 }
 
+.stories-hero-subtitle {
+  margin-bottom: 16px;
+}
+
+.stories-hero-description {
+  padding-left: 16px;
+  padding-right: 16px;
+  line-height: 1.8;
+}
+
+/* Questions Container */
+.micro-questions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* Question Card */
+.micro-question-card {
+  background: linear-gradient(to bottom right, #141414, #0D0D0D);
+  border: 1px solid #252525;
+  border-radius: 10px;
+  padding: 14px;
+  margin-left: 4px;
+  margin-right: 4px;
+  transition: all 0.3s ease;
+}
+
+.micro-question-card:hover {
+  border-color: rgba(0, 230, 118, 0.5);
+  box-shadow: 0 0 20px rgba(0, 230, 118, 0.15);
+}
+
+/* Selector Section */
+.micro-selector-section {
+  margin-bottom: 16px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* Match Select Dropdown */
 .micro-match-select {
   width: 100%;
-  background-color: #1F1F1F;
-  border: 2px solid #2D2D2D;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
+  max-width: 320px;
+  background: linear-gradient(to bottom right, #141414, #0D0D0D);
+  border: 2px solid #252525;
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  display: block;
 }
 
 .micro-match-select:hover {
-  border-color: #00E676;
-  background-color: rgba(0, 230, 118, 0.05);
+  border-color: rgba(0, 230, 118, 0.5);
 }
 
 .micro-match-select:focus {
+  border-color: #00E676;
   outline: none;
-  border-color: #00E676;
-  box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.1);
 }
 
-.micro-match-select option {
-  background-color: #1F1F1F;
-  color: white;
-  padding: 0.5rem;
-}
-
-.micro-match-card {
-  background-color: #141414;
-  border: 1px solid #252525;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+/* Stats Bar */
+.micro-stats-bar {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-}
-
-.micro-match-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.micro-live-dot {
-  width: 8px;
-  height: 8px;
-  background-color: #EF4444;
-  border-radius: 50%;
-  animation: blink 1.5s infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-.micro-match-text {
-  color: white;
-  font-weight: bold;
-  font-size: 1.125rem;
-}
-
-.micro-match-time {
-  color: #9CA3AF;
-  font-size: 1rem;
-}
-
-.micro-answered-text {
-  color: #6B7280;
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-}
-
-.micro-question-card {
-  background-color: #141414;
+  margin-bottom: 16px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 10px 14px;
+  background: rgba(20, 20, 20, 0.5);
+  border-radius: 10px;
   border: 1px solid #252525;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
 }
 
-.micro-question-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.micro-category {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #00E676;
-  font-weight: bold;
-  font-size: 0.875rem;
+/* Section Label */
+.stories-section-label {
+  color: #999;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  padding-left: 2px;
   text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
-.micro-category-icon {
-  width: 20px;
-  height: 20px;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .stories-hero-content {
+    padding-top: 30px !important;
+    padding-bottom: 25px !important;
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+
+  .stories-hero-icon {
+    margin-bottom: 24px;
+  }
+
+  .stories-hero-title {
+    font-size: 1.875rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .stories-hero-subtitle {
+    font-size: 0.9rem !important;
+  }
+
+  .stories-hero-description {
+    font-size: 0.813rem !important;
+    line-height: 1.6 !important;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .stories-hero-title-section {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .stories-section-label {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
 }
 
-.micro-points {
-  color: #FFA500;
-  font-weight: bold;
-  font-size: 0.875rem;
-}
+@media (max-width: 640px) {
+  .stories-hero-content {
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+  }
 
-.micro-question-text {
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
+  .stories-hero-icon {
+    margin-bottom: 20px;
+  }
 
-.micro-time-input {
-  background-color: #1F1F1F;
-  border: 1px solid #2D2D2D;
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  color: #6B7280;
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-  width: 100%;
-}
+  .stories-hero-icon .relative {
+    width: 80px !important;
+    height: 80px !important;
+  }
 
-.micro-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
+  .stories-hero-title {
+    font-size: 1.625rem !important;
+  }
 
-.micro-button {
-  background-color: #1F1F1F;
-  border: 2px solid #2D2D2D;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  color: #9CA3AF;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s;
-}
+  .stories-hero-subtitle {
+    font-size: 0.875rem !important;
+  }
 
-.micro-button:hover {
-  border-color: #00E676;
-  color: white;
-  background-color: rgba(0, 230, 118, 0.1);
-}
+  .stories-hero-description {
+    font-size: 0.75rem !important;
+    line-height: 1.5 !important;
+  }
 
-.micro-button.selected {
-  border-color: #00E676;
-  background-color: rgba(0, 230, 118, 0.2);
-  color: white;
+  .micro-questions-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .micro-question-card {
+    margin-left: 2px;
+    margin-right: 2px;
+    padding: 12px;
+  }
+
+  .micro-selector-section {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .micro-match-select {
+    max-width: 100%;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .micro-stats-bar {
+    margin-left: 16px;
+    margin-right: 16px;
+    padding: 8px 12px;
+  }
 }

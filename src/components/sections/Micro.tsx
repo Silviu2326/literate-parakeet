@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Header } from '../home/Header';
+import { MobileLayout } from '../../features/fantasy/presentation/shared/MobileLayout';
 import './Micro.css';
 
 interface MicroProps {
@@ -121,124 +122,177 @@ export const Micro = ({ onNavigate, points }: MicroProps) => {
   };
 
   return (
-    <div className="micro-container">
+    <MobileLayout onNavigate={onNavigate} currentView="dashboard">
       <Header points={points} />
-      <div className="micro-header">
-        <button
-          onClick={() => onNavigate('dashboard')}
-          className="micro-back-button"
-        >
-          ← Volver al inicio
-        </button>
-      </div>
-
-      <div className="micro-title-wrapper">
-        <div className="micro-icon"></div>
-        <h1 className="micro-title">Micro-Predicciones</h1>
-      </div>
-
-      <div className="micro-content">
-        {/* Selector de Partido */}
-        <div className="micro-match-selector">
-          <select
-            value={selectedMatchId}
-            onChange={(e) => handleMatchChange(e.target.value)}
-            className="micro-match-select"
-          >
-            {matches.map(match => (
-              <option key={match.id} value={match.id}>
-                {match.team1} {match.score} {match.team2} - {match.time}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Tarjeta del partido seleccionado */}
-        <div className="micro-match-card">
-          <div className="micro-match-info">
-            <div className="micro-live-dot"></div>
-            <span className="micro-match-text">
-              {selectedMatch.team1} {selectedMatch.score} {selectedMatch.team2}
-            </span>
+      <div className="min-h-screen bg-[#0D0D0D]">
+        {/* Header Visual */}
+        <div className="relative pt-32 pb-16 px-6 overflow-hidden">
+          {/* Banner Image */}
+          <div className="stories-banner-container">
+            <img
+              src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1920&q=80"
+              alt="Micro Predicciones Banner"
+              className="stories-banner-image"
+            />
+            <div className="stories-banner-overlay" />
           </div>
-          <span className="micro-match-time">{selectedMatch.time}</span>
-        </div>
 
-        <p className="micro-answered-text">{answeredCount}/{selectedMatch.questions.length} respondidas</p>
+          {/* Background Glows */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full bg-[#00E676]/5 blur-[120px] pointer-events-none z-[2]" />
 
-        {/* Preguntas dinámicas */}
-        {selectedMatch.questions.map((question, index) => {
-          const answerKey = `${selectedMatchId}-${index}`;
-          const getIcon = () => {
-            switch (question.icon) {
-              case 'clock':
-                return (
-                  <svg className="micro-category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
-                  </svg>
-                );
-              case 'alert':
-                return (
-                  <svg className="micro-category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                  </svg>
-                );
-              case 'target':
-                return (
-                  <svg className="micro-category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <circle cx="12" cy="12" r="6"/>
-                    <circle cx="12" cy="12" r="2"/>
-                  </svg>
-                );
-              case 'zap':
-                return (
-                  <svg className="micro-category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          {/* Floating Back Button */}
+          <div className="max-w-4xl mx-auto relative z-10">
+            <button
+              onClick={() => onNavigate('dashboard')}
+              className="absolute left-0 top-0 group flex items-center gap-2 text-gray-400 hover:text-[#00E676] transition-all duration-300 z-20"
+              style={{ marginLeft: '20px', marginTop: '10px' }}
+            >
+              <div className="w-14 h-14 rounded-full bg-[#141414] border border-[#252525] flex items-center justify-center group-hover:border-[#00E676]/30 group-hover:bg-[#00E676]/5 transition-all">
+                <span className="text-2xl">←</span>
+              </div>
+              <span className="hidden md:block text-xs font-bold tracking-widest uppercase">Volver</span>
+            </button>
+
+            {/* Hero Content */}
+            <div className="stories-hero-content flex flex-col items-center text-center relative">
+              {/* Main Icon */}
+              <div className="stories-hero-icon relative">
+                <div className="absolute inset-0 bg-[#00E676] blur-2xl opacity-20 animate-pulse" />
+                <div className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-[#1a3a2e] to-[#0a1f19] border-2 border-[#00E676]/30 flex items-center justify-center shadow-[0_0_50px_rgba(0,230,118,0.2)]">
+                  <svg viewBox="0 0 24 24" className="w-12 h-12 text-[#00E676]" fill="none" stroke="currentColor" strokeWidth="2">
                     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
                   </svg>
-                );
-              case 'star':
-                return (
-                  <svg className="micro-category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                  </svg>
-                );
-              default:
-                return null;
-            }
-          };
-
-          return (
-            <div key={index} className="micro-question-card">
-              <div className="micro-question-header">
-                <div className="micro-category">
-                  {getIcon()}
-                  {question.category}
                 </div>
-                <span className="micro-points">+{question.points}pts</span>
               </div>
-              <div className="micro-question-text">{question.text}</div>
-              <div className="micro-buttons">
-                <button
-                  className={`micro-button ${answers[answerKey] === true ? 'selected' : ''}`}
-                  onClick={() => handleAnswer(index, true)}
-                >
-                  Sí
-                </button>
-                <button
-                  className={`micro-button ${answers[answerKey] === false ? 'selected' : ''}`}
-                  onClick={() => handleAnswer(index, false)}
-                >
-                  No
-                </button>
+
+              {/* Title & Description */}
+              <div className="stories-hero-title-section max-w-2xl">
+                <h1 className="stories-hero-title text-4xl md:text-5xl font-black text-white tracking-tight leading-none uppercase">
+                  Micro-Predicciones
+                </h1>
+                <p className="stories-hero-subtitle text-[#00E676] text-lg font-bold tracking-wide">
+                  Apuesta en vivo minuto a minuto
+                </p>
+                <p className="stories-hero-description text-gray-500 text-sm max-w-xl mx-auto leading-relaxed">
+                  Predice eventos específicos durante el partido. Gana puntos respondiendo preguntas en tiempo real sobre lo que sucederá a continuación.
+                </p>
               </div>
             </div>
-          );
-        })}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="max-w-2xl mx-auto px-5 sm:px-6 pb-24 mt-6">
+          {/* Selector de Partido */}
+          <div className="micro-selector-section">
+            <p className="stories-section-label">Selecciona partido en vivo:</p>
+            <select
+              value={selectedMatchId}
+              onChange={(e) => handleMatchChange(e.target.value)}
+              className="micro-match-select"
+            >
+              {matches.map(match => (
+                <option key={match.id} value={match.id}>
+                  {match.team1} vs {match.team2}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="micro-stats-bar">
+            <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Respondidas</p>
+            <p className="text-[#00E676] text-lg font-black">{answeredCount}/{selectedMatch.questions.length}</p>
+          </div>
+
+          {/* Preguntas dinámicas */}
+          <div className="micro-questions-container">
+            {selectedMatch.questions.map((question, index) => {
+              const answerKey = `${selectedMatchId}-${index}`;
+              const getIcon = () => {
+                switch (question.icon) {
+                  case 'clock':
+                    return (
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                    );
+                  case 'alert':
+                    return (
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                      </svg>
+                    );
+                  case 'target':
+                    return (
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="6"/>
+                        <circle cx="12" cy="12" r="2"/>
+                      </svg>
+                    );
+                  case 'zap':
+                    return (
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                      </svg>
+                    );
+                  case 'star':
+                    return (
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                      </svg>
+                    );
+                  default:
+                    return null;
+                }
+              };
+
+              return (
+                <div
+                  key={index}
+                  className="micro-question-card"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2 text-[#00E676] text-[11px] font-bold uppercase tracking-wide">
+                      {getIcon()}
+                      <span className="hidden sm:inline">{question.category}</span>
+                    </div>
+                    <span className="px-2.5 py-1 bg-[#00E676]/10 border border-[#00E676]/20 rounded-full text-[#00E676] text-[11px] font-black">
+                      +{question.points}pts
+                    </span>
+                  </div>
+                  <p className="text-white font-bold text-[15px] mb-5 leading-relaxed">{question.text}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      className={`py-3 rounded-lg font-bold text-sm transition-all duration-300 ${
+                        answers[answerKey] === true
+                          ? 'bg-gradient-to-r from-[#00E676] to-[#00B359] text-black shadow-[0_0_15px_rgba(0,230,118,0.4)]'
+                          : 'bg-[#1a1a1a] border border-[#252525] text-white hover:border-[#00E676]/50'
+                      }`}
+                      onClick={() => handleAnswer(index, true)}
+                    >
+                      ✓ Sí
+                    </button>
+                    <button
+                      className={`py-3 rounded-lg font-bold text-sm transition-all duration-300 ${
+                        answers[answerKey] === false
+                          ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]'
+                          : 'bg-[#1a1a1a] border border-[#252525] text-white hover:border-[#00E676]/50'
+                      }`}
+                      onClick={() => handleAnswer(index, false)}
+                    >
+                      ✗ No
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
-    </div>
+    </MobileLayout>
   );
 };

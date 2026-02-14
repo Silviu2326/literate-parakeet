@@ -1,5 +1,7 @@
 import { getFlagImage } from '../../utils/helpers';
 import { Header } from '../home/Header';
+import { MobileLayout } from '../../features/fantasy/presentation/shared/MobileLayout';
+import './Groups.css';
 
 interface GroupsProps {
   onNavigate: (view: string) => void;
@@ -30,20 +32,31 @@ const GROUPS = [
 
 export const Groups = ({ onNavigate, points }: GroupsProps) => {
   return (
-    <div className="min-h-screen bg-[#0D0D0D]">
-      {/* Header Principal */}
-      <Header points={points} />
+    <MobileLayout onNavigate={onNavigate} currentView="dashboard">
+      <div className="min-h-screen bg-[#0D0D0D]">
+        {/* Header Principal */}
+        <Header points={points} />
 
       {/* Header Visual */}
       <div className="relative pt-32 pb-16 px-6 overflow-hidden">
+        {/* Banner Image */}
+        <div className="groups-banner-container">
+          <img
+            src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1920&q=80"
+            alt="Groups Banner"
+            className="groups-banner-image"
+          />
+          <div className="groups-banner-overlay" />
+        </div>
+
         {/* Background Glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full bg-[#00E676]/5 blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full bg-[#00E676]/5 blur-[120px] pointer-events-none z-[2]" />
 
         {/* Floating Back Button */}
-        <div className="max-w-7xl mx-auto relative">
+        <div className="max-w-7xl mx-auto relative z-10">
           <button
             onClick={() => onNavigate('dashboard')}
-            className="absolute left-0 top-0 group flex items-center gap-2 text-gray-400 hover:text-[#00E676] transition-all duration-300"
+            className="absolute left-0 top-0 group flex items-center gap-2 text-gray-400 hover:text-[#00E676] transition-all duration-300 z-20"
             style={{ marginLeft: '20px', marginTop: '10px' }}
           >
             <div className="w-14 h-14 rounded-full bg-[#141414] border border-[#252525] flex items-center justify-center group-hover:border-[#00E676]/30 group-hover:bg-[#00E676]/5 transition-all">
@@ -53,7 +66,7 @@ export const Groups = ({ onNavigate, points }: GroupsProps) => {
           </button>
 
           {/* Centered Hero Content */}
-          <div className="flex flex-col items-center text-center space-y-8" style={{ paddingTop: '40px' }}>
+          <div className="flex flex-col items-center text-center space-y-8 relative" style={{ paddingTop: '40px' }}>
             {/* Main Icon (Visual Anchor) */}
             <div className="relative">
               <div className="absolute inset-0 bg-[#00E676] blur-2xl opacity-20 animate-pulse" />
@@ -221,6 +234,7 @@ export const Groups = ({ onNavigate, points }: GroupsProps) => {
           ))}
         </div>
       </div>
-    </div>
+      </div>
+    </MobileLayout>
   );
 };

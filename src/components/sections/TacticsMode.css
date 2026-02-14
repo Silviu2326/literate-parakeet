@@ -1,3 +1,30 @@
+/* TacticsMode Banner Styles */
+.tactics-banner-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.tactics-banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.tactics-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 13, 13, 0.6) 0%,
+    rgba(13, 13, 13, 0.7) 50%,
+    rgba(13, 13, 13, 0.9) 100%
+  );
+  z-index: 1;
+}
+
 .tactics-playing-container {
     padding-bottom: 40px;
 }
@@ -73,22 +100,22 @@
 .tactics-menu-match-card {
     margin-left: 16px !important;
     margin-right: 16px !important;
-    margin-bottom: 40px !important;
-    padding: 32px !important;
+    margin-bottom: 32px !important;
+    padding: 20px !important;
 }
 
 .tactics-menu-match-header {
-    margin-bottom: 24px !important;
+    margin-bottom: 16px !important;
 }
 
 .tactics-menu-match-score {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
 /* Menu Team Selection */
 .tactics-menu-team-section {
-    margin-bottom: 48px !important;
+    margin-bottom: 24px !important;
     padding-left: 16px;
     padding-right: 16px;
 }
@@ -106,16 +133,16 @@
 .tactics-menu-cta-container {
     padding-left: 16px;
     padding-right: 16px;
-    margin-bottom: 48px !important;
+    margin-bottom: 24px !important;
 }
 
 /* Menu Stats Cards */
 .tactics-menu-stats-grid {
     padding-left: 16px;
     padding-right: 16px;
-    gap: 20px !important;
+    gap: 12px !important;
 }
 
 .tactics-menu-stat-card {
-    padding: 32px 24px !important;
+    padding: 16px 12px !important;
 }

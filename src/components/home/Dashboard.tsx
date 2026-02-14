@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 import {
   ChevronRight,
-  Home,
-  FileText,
-  Tv,
-  Trophy,
-  MessageSquare,
-  Calendar
+  Calendar,
+  FileText
 } from 'lucide-react';
 import { Header } from './Header';
 import { HorizontalNav } from './HorizontalNav';
+import { MobileLayout } from '../../features/fantasy/presentation/shared/MobileLayout';
 
 interface DashboardProps {
   points: number;
@@ -146,7 +143,7 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
   ];
 
   return (
-    <>
+    <MobileLayout onNavigate={onNavigate} currentView="dashboard">
     <div style={{
       minHeight: '100vh',
       background: 'var(--bg-primary)',
@@ -1319,31 +1316,7 @@ export const Dashboard = ({ points, streak, ranking, precision, onNavigate }: Da
         }
       `}</style>
     </div>
-
-      {/* NAVEGACIÓN INFERIOR */}
-      <nav style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 70,
-        background: '#1a1f2e',
-        borderTop: '2px solid #2a3142',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        zIndex: 999999,
-        boxShadow: '0 -8px 32px rgba(0,0,0,0.4), 0 -2px 8px rgba(99,102,241,0.3)',
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-      }}>
-        <BottomNavItem icon={<Home size={22} />} label="Inicio" isActive onClick={() => {}} />
-        <BottomNavItem icon={<FileText size={22} />} label="Mis Apuestas" onClick={() => onNavigate('bets')} />
-        <BottomNavItem icon={<Tv size={22} />} label="Match" onClick={() => onNavigate('match')} />
-        <BottomNavItem icon={<Trophy size={22} />} label="Ranking" onClick={() => onNavigate('ranking')} />
-        <BottomNavItem icon={<MessageSquare size={22} />} label="IA" onClick={() => onNavigate('ai')} />
-      </nav>
-    </>
+    </MobileLayout>
   );
 };
 
@@ -1502,75 +1475,5 @@ function OddButton({ label, value }: { label: string; value: number }) {
         {value}
       </span>
     </div>
-  );
-}
-
-function BottomNavItem({
-  icon,
-  label,
-  isActive = false,
-  onClick,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  isActive?: boolean;
-  onClick: () => void;
-}) {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '4px',
-        background: 'transparent',
-        border: 'none',
-        padding: 'var(--space-2)',
-        cursor: 'pointer',
-        color: isActive ? 'var(--color-primary)' : 'var(--text-tertiary)',
-        position: 'relative',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        transform: isActive || isHovered ? 'translateY(-4px)' : 'translateY(0)',
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {isActive && (
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '4px',
-          height: '4px',
-          borderRadius: '50%',
-          background: 'var(--color-primary)',
-          boxShadow: '0 0 12px rgba(99, 102, 241, 0.8)',
-          animation: 'pulse 2s ease-in-out infinite',
-        }} />
-      )}
-      <div style={{
-        filter: isActive
-          ? 'drop-shadow(0 0 12px rgba(99, 102, 241, 0.6))'
-          : isHovered
-          ? 'drop-shadow(0 0 8px rgba(99, 102, 241, 0.4))'
-          : 'none',
-        transition: 'filter 0.3s ease',
-        transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-      }}>
-        {icon}
-      </div>
-      <span style={{
-        fontSize: '10px',
-        fontWeight: isActive ? 'var(--font-bold)' : 'var(--font-medium)',
-        textShadow: isActive ? '0 0 10px rgba(99, 102, 241, 0.5)' : 'none',
-        transition: 'all 0.3s ease',
-      }}>
-        {label}
-      </span>
-    </button>
   );
 }

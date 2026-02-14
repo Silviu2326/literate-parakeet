@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Home, FileText, Tv, Trophy, MessageSquare, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { Header } from '../home/Header';
+import { MobileLayout } from '../../features/fantasy/presentation/shared/MobileLayout';
 import './AI.css';
 
 interface AIProps {
@@ -108,7 +109,7 @@ export const AI = ({ onNavigate, points }: AIProps) => {
   };
 
   return (
-    <>
+    <MobileLayout onNavigate={onNavigate} currentView="ai">
       {/* Header Principal */}
       <Header points={points} />
 
@@ -231,30 +232,7 @@ export const AI = ({ onNavigate, points }: AIProps) => {
         </div>
       </div>
 
-      {/* Bottom Navigation Tabs */}
-      <nav className="ai-bottom-nav">
-        <button onClick={() => onNavigate('dashboard')} className="ai-nav-item">
-          <Home size={22} />
-          <span>Inicio</span>
-        </button>
-        <button onClick={() => onNavigate('bets')} className="ai-nav-item">
-          <FileText size={22} />
-          <span>Mis Apuestas</span>
-        </button>
-        <button onClick={() => onNavigate('match')} className="ai-nav-item">
-          <Tv size={22} />
-          <span>Match</span>
-        </button>
-        <button onClick={() => onNavigate('ranking')} className="ai-nav-item">
-          <Trophy size={22} />
-          <span>Ranking</span>
-        </button>
-        <button onClick={() => onNavigate('ai')} className="ai-nav-item ai-nav-item-active">
-          <MessageSquare size={22} />
-          <span>IA</span>
-        </button>
-      </nav>
       </div>
-    </>
+    </MobileLayout>
   );
 };

@@ -25,71 +25,71 @@ export const HorizontalNav = ({
   activeBetsCount = 2,
   hasLiveMatch = true
 }: HorizontalNavProps) => {
-  const [activeNav, setActiveNav] = useState('matches');
+  const [activeNav, setActiveNav] = useState('');
 
   const navItems = [
     {
       id: 'bets',
-      icon: <FileText size={20} />,
+      icon: <FileText size={16} />,
       label: 'Mis Apuestas',
       badge: activeBetsCount > 0 ? activeBetsCount.toString() : null,
       badgeColor: '#00E676'
     },
     {
       id: 'match',
-      icon: <Tv size={20} />,
+      icon: <Tv size={16} />,
       label: 'Match',
       badge: hasLiveMatch ? 'LIVE' : null,
       badgeColor: '#FF1744'
     },
     {
       id: 'matches',
-      icon: <Calendar size={22} />,
+      icon: <Calendar size={18} />,
       label: 'Partidos'
     },
     {
       id: 'groups',
-      icon: <BarChart3 size={20} />,
+      icon: <BarChart3 size={16} />,
       label: 'Grupos'
     },
     {
       id: 'selections',
-      icon: <Users size={20} />,
+      icon: <Users size={16} />,
       label: 'Selecciones'
     },
     {
       id: 'venues',
-      icon: <MapPin size={20} />,
+      icon: <MapPin size={16} />,
       label: 'Sedes'
     },
     {
       id: 'tactics',
-      icon: <Gamepad2 size={20} />,
+      icon: <Gamepad2 size={16} />,
       label: 'Modo DT'
     },
     {
       id: 'fantasy',
-      icon: <Trophy size={20} />,
+      icon: <Trophy size={16} />,
       label: 'Fantasy'
     },
     {
       id: 'stories',
-      icon: <Home size={20} />,
+      icon: <Home size={16} />,
       label: 'Stories'
     },
     {
       id: 'micro',
-      icon: <Zap size={20} />,
+      icon: <Zap size={16} />,
       label: 'Micro'
     },
     {
       id: 'party',
-      icon: <PartyPopper size={20} />,
+      icon: <PartyPopper size={16} />,
       label: 'Party'
     },
     {
       id: 'news',
-      icon: <Newspaper size={20} />,
+      icon: <Newspaper size={16} />,
       label: 'Noticias'
     },
   ];
@@ -97,7 +97,7 @@ export const HorizontalNav = ({
   return (
     <div style={{
       background: '#0a0e1a',
-      padding: 'var(--space-4) 0',
+      padding: 'var(--space-2) 0',
       borderBottom: '1px solid rgba(255,255,255,0.05)',
       overflowX: 'auto',
       scrollbarWidth: 'none',
@@ -108,7 +108,7 @@ export const HorizontalNav = ({
     >
       <div style={{
         display: 'flex',
-        gap: 'var(--space-3)',
+        gap: 'var(--space-1)',
         padding: '0 var(--space-4)',
         minWidth: 'max-content',
         alignItems: 'center',
@@ -124,7 +124,7 @@ export const HorizontalNav = ({
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '8px',
+              gap: '4px',
               padding: '0',
               background: 'transparent',
               border: 'none',
@@ -157,8 +157,8 @@ export const HorizontalNav = ({
 
             {/* Icon Circle */}
             <div style={{
-              width: 56,
-              height: 56,
+              width: 32,
+              height: 32,
               borderRadius: '50%',
               border: activeNav === item.id
                 ? '2px solid #00E676'
@@ -200,7 +200,7 @@ export const HorizontalNav = ({
 
             {/* Label */}
             <span style={{
-              fontSize: '11px',
+              fontSize: '10px',
               fontWeight: activeNav === item.id ? '600' : '500',
               color: activeNav === item.id ? '#00E676' : 'rgba(255,255,255,0.6)',
               whiteSpace: 'nowrap',

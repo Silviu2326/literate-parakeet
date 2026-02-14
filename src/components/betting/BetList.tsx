@@ -9,15 +9,11 @@ import {
   Award,
   Clock,
   CheckCircle2,
-  XCircle,
-  Home,
-  FileText,
-  Tv,
-  Trophy,
-  MessageSquare
+  XCircle
 } from 'lucide-react';
 import { getFlagImage } from '../../utils/helpers';
 import { Header } from '../home/Header';
+import { MobileLayout } from '../../features/fantasy/presentation/shared/MobileLayout';
 
 interface BetListProps {
   bets: Bet[];
@@ -55,11 +51,7 @@ export const BetList = ({ bets, onOpenModal, onNavigate, points }: BetListProps)
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'var(--bg-primary)',
-      paddingBottom: 90,
-    }}>
+    <MobileLayout onNavigate={onNavigate} currentView="bets">
       {/* Header Principal */}
       <Header points={points} />
 
@@ -79,8 +71,8 @@ export const BetList = ({ bets, onOpenModal, onNavigate, points }: BetListProps)
           style={{
             position: 'absolute',
             left: 'var(--space-4)',
-            width: 36,
-            height: 36,
+            width: 32,
+            height: 32,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -91,7 +83,7 @@ export const BetList = ({ bets, onOpenModal, onNavigate, points }: BetListProps)
             cursor: 'pointer',
           }}
         >
-          <ChevronLeft size={20} />
+          <ChevronLeft size={18} />
         </button>
 
         {/* Título centrado */}
@@ -109,8 +101,8 @@ export const BetList = ({ bets, onOpenModal, onNavigate, points }: BetListProps)
           style={{
             position: 'absolute',
             right: 'var(--space-4)',
-            width: 36,
-            height: 36,
+            width: 32,
+            height: 32,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -121,7 +113,7 @@ export const BetList = ({ bets, onOpenModal, onNavigate, points }: BetListProps)
             cursor: 'pointer',
           }}
         >
-          <Plus size={20} />
+          <Plus size={18} />
         </button>
       </div>
 
@@ -133,7 +125,7 @@ export const BetList = ({ bets, onOpenModal, onNavigate, points }: BetListProps)
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
           gap: 'var(--space-3)',
-          marginBottom: 'var(--space-4)',
+          marginBottom: 0,
         }}>
           <StatCard 
             label="Total Apostado" 
@@ -165,7 +157,7 @@ export const BetList = ({ bets, onOpenModal, onNavigate, points }: BetListProps)
         <div style={{
           display: 'flex',
           gap: 'var(--space-2)',
-          marginBottom: 'var(--space-4)',
+          marginBottom: 'var(--space-3)',
           overflowX: 'auto',
           paddingBottom: 'var(--space-1)',
         }}>
@@ -205,7 +197,7 @@ export const BetList = ({ bets, onOpenModal, onNavigate, points }: BetListProps)
           <div style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--space-3)',
+            gap: 'var(--space-2)',
           }}>
             {filteredBets.map(bet => (
               <BetCard key={bet.id} bet={bet} />
@@ -214,48 +206,7 @@ export const BetList = ({ bets, onOpenModal, onNavigate, points }: BetListProps)
         )}
       </div>
 
-      {/* NAVEGACIÓN INFERIOR */}
-      <nav style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 70,
-        background: 'var(--bg-secondary)',
-        borderTop: '1px solid var(--border-primary)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        zIndex: 100,
-      }}>
-        <BottomNavItem 
-          icon={<Home size={22} />} 
-          label="Inicio" 
-          onClick={() => onNavigate?.('dashboard')} 
-        />
-        <BottomNavItem 
-          icon={<FileText size={22} />} 
-          label="Mis Apuestas" 
-          isActive 
-          onClick={() => {}} 
-        />
-        <BottomNavItem 
-          icon={<Tv size={22} />} 
-          label="Match" 
-          onClick={() => onNavigate?.('match')} 
-        />
-        <BottomNavItem
-          icon={<Trophy size={22} />}
-          label="Ranking"
-          onClick={() => onNavigate?.('ranking')}
-        />
-        <BottomNavItem
-          icon={<MessageSquare size={22} />}
-          label="IA"
-          onClick={() => onNavigate?.('ai')}
-        />
-      </nav>
-    </div>
+    </MobileLayout>
   );
 };
 
@@ -277,13 +228,13 @@ function StatCard({
       background: 'var(--bg-secondary)',
       border: '1px solid var(--border-primary)',
       borderRadius: 'var(--radius-xl)',
-      padding: 'var(--space-4)',
+      padding: 'var(--space-1) var(--space-2)',
     }}>
       <div style={{
         display: 'flex',
         alignItems: 'center',
         gap: 'var(--space-2)',
-        marginBottom: 'var(--space-2)',
+        marginBottom: 0,
         color: 'var(--text-secondary)',
       }}>
         {icon}
@@ -296,7 +247,7 @@ function StatCard({
         </span>
       </div>
       <span style={{
-        fontSize: 'var(--text-2xl)',
+        fontSize: 'var(--text-xl)',
         fontWeight: 'var(--font-black)',
         color: color,
       }}>
@@ -326,7 +277,7 @@ function FilterTab({
         display: 'flex',
         alignItems: 'center',
         gap: 'var(--space-2)',
-        padding: 'var(--space-2) var(--space-4)',
+        padding: 'var(--space-2)',
         background: isActive ? 'var(--bg-elevated)' : 'transparent',
         border: isActive ? `1px solid ${color}` : '1px solid var(--border-primary)',
         borderRadius: 'var(--radius-full)',
@@ -335,7 +286,7 @@ function FilterTab({
       }}
     >
       <span style={{
-        fontSize: 'var(--text-sm)',
+        fontSize: 'var(--text-xs)',
         fontWeight: isActive ? 'var(--font-bold)' : 'var(--font-medium)',
         color: isActive ? color : 'var(--text-secondary)',
       }}>
@@ -346,7 +297,7 @@ function FilterTab({
         fontWeight: 'var(--font-bold)',
         color: isActive ? 'var(--bg-primary)' : 'var(--text-secondary)',
         background: isActive ? color : 'var(--bg-tertiary)',
-        padding: '2px 8px',
+        padding: '1px 6px',
         borderRadius: 'var(--radius-full)',
       }}>
         {count}
@@ -432,25 +383,25 @@ function BetCard({ bet }: { bet: Bet }) {
       border: '1px solid var(--border-primary)',
       borderLeft: `3px solid ${status.color}`,
       borderRadius: 'var(--radius-xl)',
-      padding: 'var(--space-4)',
+      padding: 'var(--space-2)',
     }}>
       {/* Header con banderas */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 'var(--space-3)',
+        marginBottom: 'var(--space-1)',
       }}>
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 'var(--space-3)',
+          gap: 'var(--space-2)',
         }}>
           {/* Banderas */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 'var(--space-1)',
+            gap: 'var(--space-2)',
           }}>
             {teams.home && (
               <FlagEmoji country={teams.home} />
@@ -489,7 +440,7 @@ function BetCard({ bet }: { bet: Bet }) {
           display: 'flex',
           alignItems: 'center',
           gap: '4px',
-          padding: '4px 10px',
+          padding: '2px 8px',
           background: status.bgColor,
           borderRadius: 'var(--radius-md)',
           color: status.color,
@@ -506,20 +457,20 @@ function BetCard({ bet }: { bet: Bet }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 'var(--space-3)',
+        padding: 'var(--space-2)',
         background: 'var(--bg-tertiary)',
         borderRadius: 'var(--radius-lg)',
-        marginBottom: 'var(--space-3)',
+        marginBottom: 'var(--space-2)',
       }}>
         <span style={{
-          fontSize: 'var(--text-md)',
+          fontSize: 'var(--text-sm)',
           fontWeight: 'var(--font-bold)',
           color: 'var(--text-primary)',
         }}>
           {bet.pick}
         </span>
         <span style={{
-          fontSize: 'var(--text-md)',
+          fontSize: 'var(--text-sm)',
           fontWeight: 'var(--font-black)',
           color: 'var(--color-primary)',
         }}>
@@ -588,19 +539,19 @@ function EmptyState({ onNewBet }: { onNewBet: () => void }) {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: 'var(--space-8) var(--space-4)',
+      padding: 'var(--space-4) var(--space-3)',
       textAlign: 'center',
     }}>
       <div style={{
-        width: 80,
-        height: 80,
+        width: 64,
+        height: 64,
         background: 'var(--bg-tertiary)',
         borderRadius: 'var(--radius-xl)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '40px',
-        marginBottom: 'var(--space-4)',
+        fontSize: '32px',
+        marginBottom: 'var(--space-3)',
       }}>
         🎫
       </div>
@@ -658,13 +609,13 @@ function FlagEmoji({ country }: { country: string }) {
         if (parent) {
           const span = document.createElement('span');
           span.textContent = emoji;
-          span.style.fontSize = '20px';
+          span.style.fontSize = '18px';
           parent.insertBefore(span, target);
         }
       }}
       style={{
-        width: 28,
-        height: 20,
+        width: 24,
+        height: 18,
         borderRadius: 'var(--radius-sm)',
         objectFit: 'cover',
         boxShadow: 'var(--shadow-sm)',
@@ -673,39 +624,4 @@ function FlagEmoji({ country }: { country: string }) {
   );
 }
 
-function BottomNavItem({ 
-  icon, 
-  label, 
-  isActive = false,
-  onClick,
-}: { 
-  icon: React.ReactNode; 
-  label: string; 
-  isActive?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '4px',
-        background: 'transparent',
-        border: 'none',
-        padding: 'var(--space-2)',
-        cursor: 'pointer',
-        color: isActive ? 'var(--color-primary)' : 'var(--text-tertiary)',
-      }}
-    >
-      {icon}
-      <span style={{
-        fontSize: '10px',
-        fontWeight: isActive ? 'var(--font-bold)' : 'var(--font-medium)',
-      }}>
-        {label}
-      </span>
-    </button>
-  );
-}
+

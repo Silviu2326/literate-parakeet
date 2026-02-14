@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Header } from '../home/Header';
+import { MobileLayout } from '../../features/fantasy/presentation/shared/MobileLayout';
 import './News.css';
 import { NewsDetail } from './NewsDetail';
 
@@ -124,11 +125,21 @@ export const News = ({ onNavigate, points }: NewsProps) => {
   }
 
   return (
-    <>
+    <MobileLayout onNavigate={onNavigate} currentView="news">
       {/* Header Principal */}
       <Header points={points} />
 
       <div className="news-container">
+        {/* Banner Image */}
+        <div className="news-banner-container">
+          <img
+            src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1920&q=80"
+            alt="News Banner"
+            className="news-banner-image"
+          />
+          <div className="news-banner-overlay" />
+        </div>
+
         <div className="news-content">
           {/* Back button */}
           <button
@@ -210,6 +221,6 @@ export const News = ({ onNavigate, points }: NewsProps) => {
         </div>
       </div>
       </div>
-    </>
+    </MobileLayout>
   );
 };

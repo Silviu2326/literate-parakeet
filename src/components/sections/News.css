@@ -1,3 +1,31 @@
+/* News Banner Styles */
+.news-banner-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.news-banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.8;
+}
+
+.news-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 13, 13, 0.4) 0%,
+    rgba(13, 13, 13, 0.5) 50%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  z-index: 1;
+}
+
 .news-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #000000 100%);

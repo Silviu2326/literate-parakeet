@@ -1,6 +1,8 @@
+import { useState, useMemo } from 'react';
 import { MATCHES } from '../../data/matches';
 import { getFlagImage } from '../../utils/helpers';
 import { Header } from '../home/Header';
+import { MobileLayout } from '../../features/fantasy/presentation/shared/MobileLayout';
 import './Matches.css';
 
 interface MatchesProps {
@@ -9,18 +11,57 @@ interface MatchesProps {
 }
 
 export const Matches = ({ onNavigate, points }: MatchesProps) => {
-  // Calcular estadísticas
-  const totalMatches = MATCHES.length;
-  const liveMatches = MATCHES.filter(m => m.live).length;
-  const groupStageMatches = MATCHES.filter(m => m.g).length;
+  // Estados para filtros
+  const [selectedTeam, setSelectedTeam] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<string>('');
+
+  // Extraer valores únicos para los filtros
+  const uniqueDates = useMemo(() => {
+    const dates = [...new Set(MATCHES.map(m => m.date))];
+    return dates.sort();
+  }, []);
+
+  const uniqueTeams = useMemo(() => {
+    const teams = new Set<string>();
+    MATCHES.forEach(m => {
+      teams.add(m.h);
+      teams.add(m.a);
+    });
+    return [...teams].sort((a, b) => a.localeCompare(b));
+  }, []);
+
+  // Filtrar partidos
+  const filteredMatches = useMemo(() => {
+    return MATCHES.filter(match => {
+      const matchesTeam = selectedTeam ? (match.h === selectedTeam || match.a === selectedTeam) : true;
+      const matchesDate = selectedDate ? match.date === selectedDate : true;
+      return matchesTeam && matchesDate;
+    });
+  }, [selectedTeam, selectedDate]);
+
+  // Calcular estadísticas basadas en partidos filtrados
+  const totalMatches = filteredMatches.length;
+  const liveMatches = filteredMatches.filter(m => m.live).length;
+  const groupStageMatches = filteredMatches.filter(m => m.g).length;
 
   return (
-    <div className="matches-container">
-      {/* Header Principal */}
-      <Header points={points} />
+    <MobileLayout onNavigate={onNavigate} currentView="match">
+      <div className="matches-container">
+        {/* Header Principal */}
+        <Header points={points} />
 
-      {/* Header Visual */}
-      <div className="matches-hero">
+        {/* Header Visual */}
+        <div className="matches-hero">
+        {/* Banner Image */}
+        <div className="matches-banner-container">
+          <img
+            src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1920&q=80"
+            alt="Mundial 2026 Banner"
+            className="matches-banner-image"
+          />
+          <div className="matches-banner-overlay" />
+        </div>
+
         {/* Background Glows */}
         <div className="matches-hero-glow" />
 
@@ -91,10 +132,76 @@ export const Matches = ({ onNavigate, points }: MatchesProps) => {
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="matches-filters">
+        <div className="matches-filters-container">
+          <div className="matches-filter-group">
+            <label className="matches-filter-label">Selección</label>
+            <select
+              value={selectedTeam}
+              onChange={(e) => setSelectedTeam(e.target.value)}
+              className="matches-filter-select"
+            >
+              <option value="">Todas las selecciones</option>
+              {uniqueTeams.map(team => (
+                <option key={team} value={team}>{team}</option>
+              ))}
+            </select>
+          </div>
+          <div className="matches-filter-group">
+            <label className="matches-filter-label">Día</label>
+            <select
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="matches-filter-select"
+            >
+              <option value="">Todos los días</option>
+              {uniqueDates.map(date => (
+                <option key={date} value={date}>{date}</option>
+              ))}
+            </select>
+          </div>
+          {(selectedTeam || selectedDate) && (
+            <button
+              onClick={() => {
+                setSelectedTeam('');
+                setSelectedDate('');
+              }}
+              className="matches-filter-clear"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Limpiar
+            </button>
+          )}
+        </div>
+        {(selectedTeam || selectedDate) && (
+          <div className="matches-filter-results">
+            Mostrando {filteredMatches.length} de {MATCHES.length} partidos
+          </div>
+        )}
+      </div>
+
       {/* Content */}
       <div className="matches-content">
         <div className="matches-list">
-          {MATCHES.map((match) => (
+          {filteredMatches.length === 0 ? (
+            <div className="matches-empty">
+              <div className="matches-empty-icon">🔍</div>
+              <p className="matches-empty-text">No se encontraron partidos con los filtros seleccionados</p>
+              <button
+                onClick={() => {
+                  setSelectedTeam('');
+                  setSelectedDate('');
+                }}
+                className="matches-empty-button"
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          ) : (
+            filteredMatches.map((match) => (
             <div key={match.id} className="match-card">
               {/* Fecha y ubicación header */}
               <div className="match-card-header">
@@ -148,9 +255,11 @@ export const Matches = ({ onNavigate, points }: MatchesProps) => {
                 </div>
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
       </div>
-    </div>
+      </div>
+    </MobileLayout>
   );
 };

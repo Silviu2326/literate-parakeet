@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FLAG_MAP } from '../../data/flags';
 import { Header } from '../home/Header';
+import { MobileLayout } from '../../features/fantasy/presentation/shared/MobileLayout';
 import './TacticsMode.css';
 
 interface TacticsModeProps {
@@ -164,8 +165,14 @@ export const TacticsMode = ({ onNavigate, points }: TacticsModeProps) => {
                 <span className="text-white font-black text-xl">Minuto {question.minute}'</span>
               </div>
               <div className="flex items-center gap-3 px-4 py-2 bg-[#1a1a1a] rounded-xl border border-[#252525]">
-                <span className="text-2xl">🇲🇽</span>
-                <span className="text-white font-bold text-lg">MX 1-0</span>
+                <img
+                  src={`https://flagcdn.com/w40/${FLAG_MAP[selectedTeam]}.png`}
+                  alt={selectedTeam}
+                  className="w-8 h-6 rounded object-cover shadow-sm"
+                />
+                <span className="text-white font-bold text-lg">
+                  {selectedTeam.substring(0, 3).toUpperCase()} 1-0
+                </span>
               </div>
             </div>
           </div>
@@ -448,20 +455,31 @@ export const TacticsMode = ({ onNavigate, points }: TacticsModeProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D]">
-      {/* Header Principal */}
-      <Header points={points} />
+    <MobileLayout onNavigate={onNavigate} currentView="dashboard">
+      <div className="min-h-screen bg-[#0D0D0D]">
+        {/* Header Principal */}
+        <Header points={points} />
 
       {/* Header Visual */}
       <div className="relative pb-16 px-6 overflow-hidden">
+        {/* Banner Image */}
+        <div className="tactics-banner-container">
+          <img
+            src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1920&q=80"
+            alt="Tactics Mode Banner"
+            className="tactics-banner-image"
+          />
+          <div className="tactics-banner-overlay" />
+        </div>
+
         {/* Background Glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full bg-[#00E676]/5 blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full bg-[#00E676]/5 blur-[120px] pointer-events-none z-[2]" />
 
         {/* Floating Back Button */}
-        <div className="max-w-4xl mx-auto relative">
+        <div className="max-w-4xl mx-auto relative z-10">
           <button
             onClick={() => onNavigate('dashboard')}
-            className="absolute left-0 top-0 group flex items-center gap-2 text-gray-400 hover:text-[#00E676] transition-all duration-300"
+            className="absolute left-0 top-0 group flex items-center gap-2 text-gray-400 hover:text-[#00E676] transition-all duration-300 z-20"
             style={{ marginLeft: '20px', marginTop: '10px' }}
           >
             <div className="w-14 h-14 rounded-full bg-[#141414] border border-[#252525] flex items-center justify-center group-hover:border-[#00E676]/30 group-hover:bg-[#00E676]/5 transition-all">
@@ -471,7 +489,7 @@ export const TacticsMode = ({ onNavigate, points }: TacticsModeProps) => {
           </button>
 
           {/* Hero Content */}
-          <div className="tactics-hero-content flex flex-col items-center text-center">
+          <div className="tactics-hero-content flex flex-col items-center text-center relative">
             {/* Main Icon */}
             <div className="tactics-hero-icon relative">
               <div className="absolute inset-0 bg-[#00E676] blur-2xl opacity-20 animate-pulse" />
@@ -510,8 +528,12 @@ export const TacticsMode = ({ onNavigate, points }: TacticsModeProps) => {
 
           <div className="tactics-menu-match-score flex items-center justify-center gap-6">
             <div className="flex flex-col items-center gap-2">
-              <span className="text-5xl">🇲🇽</span>
-              <span className="text-white font-black text-sm uppercase tracking-tighter">México</span>
+              <img
+                src={`https://flagcdn.com/w80/${FLAG_MAP[selectedTeam]}.png`}
+                alt={selectedTeam}
+                className="w-14 h-10 rounded object-cover shadow-lg"
+              />
+              <span className="text-white font-black text-sm uppercase tracking-tighter">{selectedTeam}</span>
             </div>
             <div className="flex items-center gap-3 px-6 py-3 bg-[#1a1a1a] rounded-2xl border border-[#252525] shadow-inner">
               <span className="text-white font-black text-4xl">1</span>
@@ -519,8 +541,12 @@ export const TacticsMode = ({ onNavigate, points }: TacticsModeProps) => {
               <span className="text-white font-black text-4xl">0</span>
             </div>
             <div className="flex flex-col items-center gap-2">
+              <img
+                src="https://flagcdn.com/w80/za.png"
+                alt="Sudáfrica"
+                className="w-14 h-10 rounded object-cover shadow-lg"
+              />
               <span className="text-white font-black text-sm uppercase tracking-tighter text-center">Sudáfrica</span>
-              <span className="text-5xl">🇿🇦</span>
             </div>
           </div>
         </div>
@@ -575,19 +601,20 @@ export const TacticsMode = ({ onNavigate, points }: TacticsModeProps) => {
         {/* Stats Cards */}
         <div className="tactics-menu-stats-grid grid grid-cols-3">
           <div className="tactics-menu-stat-card bg-[#141414] border border-[#252525] rounded-2xl text-center hover:border-[#00E676]/30 transition-colors">
-            <div className="text-[#00E676] font-black text-3xl mb-1">5</div>
+            <div className="text-[#00E676] font-black text-2xl mb-1">5</div>
             <div className="text-gray-600 text-[10px] font-bold uppercase tracking-wider">Decisiones</div>
           </div>
           <div className="tactics-menu-stat-card bg-[#141414] border border-[#252525] rounded-2xl text-center hover:border-[#00E676]/30 transition-colors">
-            <div className="text-[#00E676] font-black text-3xl mb-1">250</div>
+            <div className="text-[#00E676] font-black text-2xl mb-1">250</div>
             <div className="text-gray-600 text-[10px] font-bold uppercase tracking-wider">Pts máx</div>
           </div>
           <div className="tactics-menu-stat-card bg-[#141414] border border-[#252525] rounded-2xl text-center hover:border-[#00E676]/30 transition-colors">
-            <div className="text-[#00E676] font-black text-3xl mb-1">90'</div>
+            <div className="text-[#00E676] font-black text-2xl mb-1">90'</div>
             <div className="text-gray-600 text-[10px] font-bold uppercase tracking-wider">Duración</div>
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </MobileLayout>
     );
   };

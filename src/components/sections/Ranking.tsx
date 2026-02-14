@@ -3,14 +3,11 @@ import {
   ChevronLeft,
   Trophy,
   TrendingUp,
-  Home,
-  FileText,
-  Tv,
-  MessageSquare,
   Zap,
   Search
 } from 'lucide-react';
 import { Header } from '../home/Header';
+import { MobileLayout } from '../../features/fantasy/presentation/shared/MobileLayout';
 
 interface RankingProps {
   onNavigate: (view: string) => void;
@@ -90,11 +87,7 @@ export const Ranking = ({ onNavigate, points }: RankingProps) => {
   );
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'var(--bg-primary)',
-      paddingBottom: 0,
-    }}>
+    <MobileLayout onNavigate={onNavigate} currentView="ranking">
       {/* Header Principal */}
       <Header points={points} />
 
@@ -382,28 +375,8 @@ export const Ranking = ({ onNavigate, points }: RankingProps) => {
         </div>
       </div>
 
-      {/* NAVEGACIÓN INFERIOR */}
-      <nav style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 70,
-        background: 'var(--bg-secondary)',
-        borderTop: '1px solid var(--border-primary)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        zIndex: 100,
-      }}>
-        <BottomNavItem icon={<Home size={22} />} label="Inicio" onClick={() => onNavigate('dashboard')} />
-        <BottomNavItem icon={<FileText size={22} />} label="Mis Apuestas" onClick={() => onNavigate('bets')} />
-        <BottomNavItem icon={<Tv size={22} />} label="Match" onClick={() => onNavigate('match')} />
-        <BottomNavItem icon={<Trophy size={22} />} label="Ranking" isActive onClick={() => {}} />
-        <BottomNavItem icon={<MessageSquare size={22} />} label="IA" onClick={() => onNavigate('ai')} />
-      </nav>
       </div>
-    </div>
+    </MobileLayout>
   );
 };
 
@@ -654,39 +627,4 @@ function RankCard({ player, isMe }: { player: Player; isMe?: boolean }) {
   );
 }
 
-function BottomNavItem({ 
-  icon, 
-  label, 
-  isActive = false,
-  onClick,
-}: { 
-  icon: React.ReactNode; 
-  label: string; 
-  isActive?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '4px',
-        background: 'transparent',
-        border: 'none',
-        padding: 'var(--space-2)',
-        cursor: 'pointer',
-        color: isActive ? 'var(--color-primary)' : 'var(--text-tertiary)',
-      }}
-    >
-      {icon}
-      <span style={{
-        fontSize: '10px',
-        fontWeight: isActive ? 'var(--font-bold)' : 'var(--font-medium)',
-      }}>
-        {label}
-      </span>
-    </button>
-  );
-}
+

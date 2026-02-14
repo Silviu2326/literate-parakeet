@@ -5,11 +5,13 @@ import { useFantasyStore } from '../../application/store/fantasyStore';
 interface MobileLayoutProps {
   children: ReactNode;
   onNavigate?: (view: string) => void;
+  currentView?: string;
 }
 
-export function MobileLayout({ children, onNavigate }: MobileLayoutProps) {
-  const selectedView = useFantasyStore((state) => state.selectedView);
+export function MobileLayout({ children, onNavigate, currentView }: MobileLayoutProps) {
+  const storeView = useFantasyStore((state) => state.selectedView);
   const setView = useFantasyStore((state) => state.setView);
+  const selectedView = currentView ?? storeView;
 
   // No mostrar navbar en ciertas vistas
   const hideNavbar = selectedView === 'duels' || selectedView === 'user-detail';
@@ -28,7 +30,7 @@ export function MobileLayout({ children, onNavigate }: MobileLayoutProps) {
     <div style={{
       minHeight: '100vh',
       background: 'var(--bg-primary)',
-      paddingBottom: hideNavbar ? 0 : 80,
+      paddingBottom: hideNavbar ? 0 : 55,
     }}>
       {children}
 
@@ -39,7 +41,7 @@ export function MobileLayout({ children, onNavigate }: MobileLayoutProps) {
           bottom: 0,
           left: 0,
           right: 0,
-          height: 70,
+          height: 50,
           background: 'var(--bg-secondary)',
           borderTop: '1px solid var(--border-primary)',
           display: 'flex',
@@ -57,13 +59,13 @@ export function MobileLayout({ children, onNavigate }: MobileLayoutProps) {
           <NavItem
             icon={<FileText size={22} />}
             label="Mis Apuestas"
-            isActive={false}
+            isActive={selectedView === 'bets'}
             onClick={() => handleNavigation('bets')}
           />
           <NavItem
             icon={<Tv size={22} />}
             label="Match"
-            isActive={false}
+            isActive={selectedView === 'match'}
             onClick={() => handleNavigation('match')}
           />
           <NavItem
@@ -75,7 +77,7 @@ export function MobileLayout({ children, onNavigate }: MobileLayoutProps) {
           <NavItem
             icon={<MessageSquare size={22} />}
             label="IA"
-            isActive={false}
+            isActive={selectedView === 'ai'}
             onClick={() => handleNavigation('ai')}
           />
         </nav>

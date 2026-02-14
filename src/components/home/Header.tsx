@@ -14,12 +14,16 @@ export const Header = ({ points }: HeaderProps) => {
 
   return (
     <div style={{
-      background: '#1a1d29',
-      padding: 'var(--space-3) var(--space-4)',
+      background: 'rgba(26, 29, 41, 0.8)',
+      backdropFilter: 'blur(10px)',
+      WebkitBackdropFilter: 'blur(10px)',
+      padding: 'var(--space-2) var(--space-4)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      borderBottom: '1px solid var(--border-primary)',
+      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+      position: 'relative',
+      zIndex: 100,
     }}>
       {/* Logo a la izquierda */}
       <div style={{
@@ -61,7 +65,7 @@ export const Header = ({ points }: HeaderProps) => {
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '6px 12px',
+            padding: '3px 8px',
             background: '#262937',
             borderRadius: 'var(--radius-md)',
             border: '1px solid #2f3242',
@@ -75,21 +79,8 @@ export const Header = ({ points }: HeaderProps) => {
             e.currentTarget.style.borderColor = '#2f3242';
           }}
         >
-          <img
-            src={language === 'ES'
-              ? 'https://flagcdn.com/w40/es.png'
-              : 'https://flagcdn.com/w40/gb.png'
-            }
-            alt={language === 'ES' ? 'España' : 'United Kingdom'}
-            style={{
-              width: 20,
-              height: 13,
-              objectFit: 'cover',
-              borderRadius: '2px',
-            }}
-          />
           <span style={{
-            fontSize: 'var(--text-sm)',
+            fontSize: 'var(--text-xs)',
             fontWeight: 'var(--font-bold)',
             color: '#00ff94',
           }}>{language}</span>
@@ -105,9 +96,9 @@ export const Header = ({ points }: HeaderProps) => {
           borderRadius: 'var(--radius-md)',
           border: '1px solid #2f3242',
         }}>
-          <Star size={16} style={{ color: '#00ff94', fill: '#00ff94' }} />
+          <Star size={14} style={{ color: '#00ff94', fill: '#00ff94' }} />
           <span style={{
-            fontSize: 'var(--text-md)',
+            fontSize: 'var(--text-sm)',
             fontWeight: 'var(--font-black)',
             color: '#00ff94',
           }}>
@@ -118,8 +109,8 @@ export const Header = ({ points }: HeaderProps) => {
         {/* Settings */}
         <button
           style={{
-            width: 40,
-            height: 40,
+            width: 32,
+            height: 32,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -130,7 +121,7 @@ export const Header = ({ points }: HeaderProps) => {
             cursor: 'pointer',
           }}
         >
-          <Settings size={20} />
+          <Settings size={18} />
         </button>
       </div>
     </div>

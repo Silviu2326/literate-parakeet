@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Header } from '../home/Header';
+import { MobileLayout } from '../../features/fantasy/presentation/shared/MobileLayout';
 import './Stories.css';
 
 interface StoriesProps {
@@ -84,7 +85,7 @@ export const Stories = ({ onNavigate, points }: StoriesProps) => {
     const themeColors = getThemeColors();
 
     return (
-      <>
+      <MobileLayout onNavigate={onNavigate} currentView="dashboard">
         <Header points={points} />
         <div className="min-h-screen bg-[#0D0D0D]">
           <div className="stories-preview-container">
@@ -206,24 +207,34 @@ export const Stories = ({ onNavigate, points }: StoriesProps) => {
           </button>
         </div>
       </div>
-    </>
+      </MobileLayout>
   );
 }
 
   return (
-    <>
+    <MobileLayout onNavigate={onNavigate} currentView="dashboard">
       <Header points={points} />
       <div className="min-h-screen bg-[#0D0D0D] pt-32">
       {/* Header Visual */}
       <div className="relative pt-32 pb-16 px-6 overflow-hidden">
+        {/* Banner Image */}
+        <div className="stories-banner-container">
+          <img
+            src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1920&q=80"
+            alt="Stories Banner"
+            className="stories-banner-image"
+          />
+          <div className="stories-banner-overlay" />
+        </div>
+
         {/* Background Glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full bg-[#00E676]/5 blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full bg-[#00E676]/5 blur-[120px] pointer-events-none z-[2]" />
 
         {/* Floating Back Button */}
-        <div className="max-w-4xl mx-auto relative">
+        <div className="max-w-4xl mx-auto relative z-10">
           <button
             onClick={() => onNavigate('dashboard')}
-            className="absolute left-0 top-0 group flex items-center gap-2 text-gray-400 hover:text-[#00E676] transition-all duration-300"
+            className="absolute left-0 top-0 group flex items-center gap-2 text-gray-400 hover:text-[#00E676] transition-all duration-300 z-20"
             style={{ marginLeft: '20px', marginTop: '10px' }}
           >
             <div className="w-14 h-14 rounded-full bg-[#141414] border border-[#252525] flex items-center justify-center group-hover:border-[#00E676]/30 group-hover:bg-[#00E676]/5 transition-all">
@@ -233,7 +244,7 @@ export const Stories = ({ onNavigate, points }: StoriesProps) => {
           </button>
 
           {/* Hero Content */}
-          <div className="stories-hero-content flex flex-col items-center text-center">
+          <div className="stories-hero-content flex flex-col items-center text-center relative">
             {/* Main Icon */}
             <div className="stories-hero-icon relative">
               <div className="absolute inset-0 bg-[#00E676] blur-2xl opacity-20 animate-pulse" />
@@ -380,6 +391,6 @@ export const Stories = ({ onNavigate, points }: StoriesProps) => {
         </div>
       </div>
     </div>
-      </>
+    </MobileLayout>
     );
   };
